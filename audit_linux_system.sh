@@ -11,6 +11,11 @@
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with this file. If not, see <http://www.gnu.org/licenses/>.
+##
+#
+# Installation:
+#
+# echo "cd /etc/bacula/scripts && git clone https://github.com/MykolaPerehinets/auditlinuxsystem.git"
 #
 # Script function: Audit Linux systems/services for correct backup process
 #
