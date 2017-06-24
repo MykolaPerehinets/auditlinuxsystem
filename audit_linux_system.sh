@@ -14,25 +14,25 @@
 #
 # Script function: Audit Linux systems/services for correct backup process
 #
-# Script requirements:                                                                                                                                                                                                                      
-# # yum install bacula-client vim parted pciutils yum-plugin-security yum-plugin-verify yum-plugin-changelog lsusb lshw usbutils lsscsi pigz mlocate time glances tuned redhat-lsb-core etckeeper firewalld mailx policycoreutils-python policycoreutils-newrole policycoreutils-restorecond setools-console lsof iotop htop tree mutt                                                                                                                                                   
-#                                                                                                                                                                                                                                           
-# Addditional requirements: for initial etckeeper run next command from root                                                                                                                                                                
-# # cd /etc                                                                                                                                                                                                                                 
-# # sudo etckeeper init                                                                                                                                                                                                                     
-# # sudo etckeeper commit "Initial import"                                                                                                                                                                                                  
-# # git config --global user.name "root"                                                                                                                                                                                                    
+# Script requirements:
+# # yum install bacula-client vim parted pciutils yum-plugin-security yum-plugin-verify yum-plugin-changelog lsusb lshw usbutils lsscsi pigz mlocate time glances tuned redhat-lsb-core etckeeper firewalld mailx policycoreutils-python policycoreutils-newrole policycoreutils-restorecond setools-console lsof iotop htop tree mutt
+#
+# Addditional requirements: for initial etckeeper run next command from root
+# # cd /etc
+# # sudo etckeeper init
+# # sudo etckeeper commit "Initial import"
+# # git config --global user.name "root"
 # # git config --global user.email root@"HOSTNAME"."DOMAIN"                                                                                                                                                                      "
-# #                                                                                                                                                                                                                                         
-# Addditional requirements: for initial bacula scripts run next command from root                                                                                                                                                           
-# # cd /etc/bacula/scripts                                                                                                                                                                                                                  
-# # setenforce 0                                                                                                                                                                                                                            
-# # tail -fn 0 /var/log/audit/audit.log | grep bacula > /etc/bacula/bacula-audit.log                                                                                                                                                        
-# # * (run a backup job that has a pre-script)                                                                                                                                                                                              
-# # chcon system_u:object_r:bacula_exec_t:s0 /etc/bacula/scripts                                                                                                                                                                            
-# # semanage fcontext -a -t bacula_exec_t "/etc/bacula/scripts(/.*)?"                                                                                                                                                                       
-# # restorecon -R -v /etc/bacula/scripts                                                                                                                                                                                                    
-#        restorecon reset /etc/bacula/scripts/audit_linux_system.sh context unconfined_u:object_r:bacula_etc_t:s0->unconfined_u:object_r:bacula_exec_t:s0                                                                                   
+# #
+# Addditional requirements: for initial bacula scripts run next command from root
+# # cd /etc/bacula/scripts
+# # setenforce 0
+# # tail -fn 0 /var/log/audit/audit.log | grep bacula > /etc/bacula/bacula-audit.log
+# # * (run a backup job that has a pre-script)
+# # chcon system_u:object_r:bacula_exec_t:s0 /etc/bacula/scripts
+# # semanage fcontext -a -t bacula_exec_t "/etc/bacula/scripts(/.*)?"
+# # restorecon -R -v /etc/bacula/scripts
+#        restorecon reset /etc/bacula/scripts/audit_linux_system.sh context unconfined_u:object_r:bacula_etc_t:s0->unconfined_u:object_r:bacula_exec_t:s0
 #        restorecon reset /etc/bacula/scripts/make_dumpall_pgsql.sh context unconfined_u:object_r:bacula_etc_t:s0->unconfined_u:object_r:bacula_exec_t:s0
 #        restorecon reset /etc/bacula/scripts/verify_dumpall_pgsql.sh context unconfined_u:object_r:bacula_etc_t:s0->unconfined_u:object_r:bacula_exec_t:s0
 #        restorecon reset /etc/bacula/scripts/delete_dumpall_pgsql.sh context unconfined_u:object_r:bacula_etc_t:s0->unconfined_u:object_r:bacula_exec_t:s0
@@ -60,6 +60,11 @@
 # # ...
 # # DONE
 # # setenforce 1
+#
+# Script Submitted and Deployment in production environments by:
+# Mykola Perehinets (mperehin)
+# Tel: +380 67 772 6910
+# mailto:mykola.perehinets@gmail.com
 #
 #######################################################################################################################
 # Script modified date
@@ -138,7 +143,6 @@ cat /boot/grub/menu.lst >> $auditlogdir/server_inventory_$HOSTNAME.log
 echo "-----------------------------------------------------------------------------------------------------------------" >> $auditlogdir/server_inventory_$HOSTNAME.log
 echo "cat /boot/grub/grub.*:" >> $auditlogdir/server_inventory_$HOSTNAME.log
 cat /boot/grub/grub.* >> $auditlogdir/server_inventory_$HOSTNAME.log
-#cat /boot/grub/grub.cfg >> $auditlogdir/server_inventory_$HOSTNAME.log
 echo "-----------------------------------------------------------------------------------------------------------------" >> $auditlogdir/server_inventory_$HOSTNAME.log
 echo "cat /boot/grub2/device.map:" >> $auditlogdir/server_inventory_$HOSTNAME.log
 cat /boot/grub2/device.map >> $auditlogdir/server_inventory_$HOSTNAME.log
@@ -149,7 +153,6 @@ echo ""
 echo "-----------------------------------------------------------------------------------------------------------------" >> $auditlogdir/server_inventory_$HOSTNAME.log
 echo "cat /boot/grub2/grub.*:" >> $auditlogdir/server_inventory_$HOSTNAME.log
 cat /boot/grub2/grub.* >> $auditlogdir/server_inventory_$HOSTNAME.log
-#cat /boot/grub2/grub.cfg >> $auditlogdir/server_inventory_$HOSTNAME.log
 echo "-----------------------------------------------------------------------------------------------------------------" >> $auditlogdir/server_inventory_$HOSTNAME.log
 echo "uname -a:" >> $auditlogdir/server_inventory_$HOSTNAME.log
 uname -a >> $auditlogdir/server_inventory_$HOSTNAME.log
@@ -331,9 +334,9 @@ echo "--------------------------------------------------------------------------
 echo "cat /etc/bacula/bacula-fd.conf:" >> $auditlogdir/server_inventory_$HOSTNAME.log
 cat /etc/bacula/bacula-fd.conf >> $auditlogdir/server_inventory_$HOSTNAME.log
 echo "-----------------------------------------------------------------------------------------------------------------" >> $auditlogdir/server_inventory_$HOSTNAME.log
-#echo "cat /etc/bacula/bconsole.conf:" >> $auditlogdir/server_inventory_$HOSTNAME.log
-#cat /etc/bacula/bconsole.conf >> $auditlogdir/server_inventory_$HOSTNAME.log
-#echo "-----------------------------------------------------------------------------------------------------------------" >> $auditlogdir/server_inventory_$HOSTNAME.log
+echo "cat /etc/bacula/bconsole.conf:" >> $auditlogdir/server_inventory_$HOSTNAME.log
+cat /etc/bacula/bconsole.conf >> $auditlogdir/server_inventory_$HOSTNAME.log
+echo "-----------------------------------------------------------------------------------------------------------------" >> $auditlogdir/server_inventory_$HOSTNAME.log
 echo "ls -l /etc/bacula/scripts/:" >> $auditlogdir/server_inventory_$HOSTNAME.log
 ls -l /etc/bacula/scripts/ >> $auditlogdir/server_inventory_$HOSTNAME.log
 echo "-----------------------------------------------------------------------------------------------------------------" >> $auditlogdir/server_inventory_$HOSTNAME.log
@@ -367,8 +370,7 @@ echo "Create backup inventory data and store in $auditlogdir/server_inventory_$H
 echo "This data file is needed for Disaster Recovery Plan using in Corporate Backup System Bacula!"
 #echo "OK... Audit your system has been DONE... Thank you..."
 #
-# Sending copy of data to admins group
-#msg="WARNING: This is copy of inventory data on HOST: $HOSTNAME, verify at $DATE_START. This file is needed for recovery procedures... -->"
+# Sending copy of data to Admins MailGroup
 msg="This is copy of inventory data on HOST: $HOSTNAME, verify at $DATE_START. This file is needed for recovery procedures... -->"
 #echo $msg
 #msg_body=`cat $auditlogdir/server_inventory_$HOSTNAME.log | sed "s/'/\n/g` > $auditlogdir/server_inventory_$HOSTNAME.log.win.txt
@@ -381,10 +383,10 @@ msg_body=`cat $auditlogdir/server_inventory_$HOSTNAME.log.win.txt`
 /bin/chmod 0644 $auditlogdir/server_inventory_$HOSTNAME.log.win.txt
 /bin/chmod 0644 $auditlogdir/server_inventory_$HOSTNAME.log
 cd /
-echo "$msg" | mail -s "WARNING: inventory of HOST: $HOSTNAME -->" -a $auditlogdir/server_inventory_$HOSTNAME.log.win.txt $ADMIN
+#echo "$msg" | mail -s "WARNING: inventory of HOST: $HOSTNAME -->" -a $auditlogdir/server_inventory_$HOSTNAME.log.win.txt $ADMIN
 #echo -n $msg $msg_body | mail -s "WARNING: inventory of HOST: $HOSTNAME -->" $ADMIN
-#echo -n $msg | mutt -s "WARNING: inventory of HOST: $HOSTNAME -->" -a $auditlogdir/server_inventory_$HOSTNAME.log.win.txt $ADMIN
-echo "Sending copy this data file to IS APP Team Admins - MailGroup: $ADMIN "
+echo -n $msg | mutt -s "WARNING: inventory of HOST: $HOSTNAME -->" -a $auditlogdir/server_inventory_$HOSTNAME.log.win.txt $ADMIN
+echo "Sending copy this data file to Admins - MailGroup: $ADMIN "
 echo "OK... Very well... Please Start-up next Corporate Bacula Backup System procedures..."
 #
 # Exit code script status
@@ -393,4 +395,4 @@ exit 0;
 else
 exit 1;
 fi
- 
+
