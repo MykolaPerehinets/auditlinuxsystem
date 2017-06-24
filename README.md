@@ -6,4 +6,5 @@ Unfortunately, many of the steps one must take before and immediately after a di
 
 Installation
 
-git clone https://github.com/MykolaPerehinets/auditlinuxsystem.git
+cd /etc/bacula/scripts   &&   git clone https://github.com/MykolaPerehinets/auditlinuxsystem.git
+
