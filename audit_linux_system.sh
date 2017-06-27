@@ -27,7 +27,7 @@
 # # sudo etckeeper init
 # # sudo etckeeper commit "Initial import"
 # # git config --global user.name "root"
-# # git config --global user.email root@"HOSTNAME"."DOMAIN"                                                                                                                                                                      "
+# # git config --global user.email root@"HOSTNAME"."DOMAIN"
 # #
 # Addditional requirements: for initial bacula scripts run next command from root
 # # cd /etc/bacula/scripts
@@ -81,6 +81,7 @@ ERR=0
 # Basic script configuration, etc...
 PATH=/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin
 #
+#ADMIN="root@"HOSTNAME"."DOMAIN""
 ADMIN="BaculaBackupOperators@localhost.localdomain"
 #
 #HOSTNAME=`hostname -s`
