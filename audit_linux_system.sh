@@ -13,7 +13,7 @@
 ## along with this file. If not, see <http://www.gnu.org/licenses/>.
 ##
 #
-# Installation:
+# Script installation:
 #
 # echo "cd /etc/bacula/scripts && git clone https://github.com/MykolaPerehinets/auditlinuxsystem.git"
 #
@@ -73,7 +73,7 @@
 #
 #######################################################################################################################
 # Script modified date
-Version=24062017
+Version=27062017
 #
 #######################################################################################################################
 # Exit code
@@ -89,7 +89,6 @@ HOSTNAME=`hostname`
 DATE=$(date +%Y-%m-%d_%H:%M)
 #DATE=$(date +%Y-%m-%d)
 #DATE_START=$(date +%H:%M)
-#DATE_START=$(date +%Y-%m-%d__%H:%M)
 DATE_START=$(date +%Y-%m-%d_%H:%M)
 #
 # Store inventory log files in this folder
@@ -369,13 +368,13 @@ echo "End of File" >> $auditlogdir/server_inventory_$HOSTNAME.log
 #
 echo "####################################################################################"
 #
-# Create and Verify other parameters
+# Create and verify other parameters
 /bin/chmod 0644 $auditlogdir/server_inventory_$HOSTNAME.log
 echo "Create backup inventory data and store in $auditlogdir/server_inventory_$HOSTNAME.log"
 echo "This data file is needed for Disaster Recovery Plan using in Corporate Backup System Bacula!"
 #echo "OK... Audit your system has been DONE... Thank you..."
 #
-# Sending copy of data to Admins MailGroup
+# Sending copy of data to admins MailGroup
 msg="This is copy of inventory data on HOST: $HOSTNAME, verify at $DATE_START. This file is needed for recovery procedures... -->"
 #echo $msg
 #msg_body=`cat $auditlogdir/server_inventory_$HOSTNAME.log | sed "s/'/\n/g` > $auditlogdir/server_inventory_$HOSTNAME.log.win.txt
@@ -391,7 +390,7 @@ cd /
 #echo "$msg" | mail -s "WARNING: inventory of HOST: $HOSTNAME -->" -a $auditlogdir/server_inventory_$HOSTNAME.log.win.txt $ADMIN
 #echo -n $msg $msg_body | mail -s "WARNING: inventory of HOST: $HOSTNAME -->" $ADMIN
 echo -n $msg | mutt -s "WARNING: inventory of HOST: $HOSTNAME -->" -a $auditlogdir/server_inventory_$HOSTNAME.log.win.txt $ADMIN
-echo "Sending copy this data file to Admins - MailGroup: $ADMIN "
+echo "Sending copy this data file to admins - MailGroup: $ADMIN "
 echo "OK... Very well... Please Start-up next Corporate Bacula Backup System procedures..."
 #
 # Exit code script status
