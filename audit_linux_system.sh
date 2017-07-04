@@ -20,51 +20,51 @@
 # Script function: Audit Linux systems/services for correct backup process
 #
 # Script requirements:
-# # yum install bacula-client vim parted pciutils yum-plugin-security yum-plugin-verify yum-plugin-changelog lsusb lshw usbutils lsscsi pigz mlocate time glances tuned redhat-lsb-core etckeeper firewalld mailx policycoreutils-python policycoreutils-newrole policycoreutils-restorecond setools-console lsof iotop htop tree mutt
+# yum install bacula-client vim parted pciutils yum-plugin-security yum-plugin-verify yum-plugin-changelog lsusb lshw usbutils lsscsi pigz mlocate time glances tuned redhat-lsb-core etckeeper firewalld mailx policycoreutils-python policycoreutils-newrole policycoreutils-restorecond setools-console lsof iotop htop tree mutt psacct
 #
 # Addditional requirements: for initial etckeeper run next command from root
-# # cd /etc
-# # sudo etckeeper init
-# # sudo etckeeper commit "Initial import"
-# # git config --global user.name "root"
-# # git config --global user.email root@"HOSTNAME"."DOMAIN"
-# #
+# cd /etc
+# sudo etckeeper init
+# sudo etckeeper commit "Initial import"
+# git config --global user.name "root"
+# git config --global user.email root@"HOSTNAME"."DOMAIN"
+#
 # Addditional requirements: for initial bacula scripts run next command from root
-# # cd /etc/bacula/scripts
-# # setenforce 0
-# # tail -fn 0 /var/log/audit/audit.log | grep bacula > /etc/bacula/bacula-audit.log
-# # * (run a backup job that has a pre-script)
-# # chcon system_u:object_r:bacula_exec_t:s0 /etc/bacula/scripts
-# # semanage fcontext -a -t bacula_exec_t "/etc/bacula/scripts(/.*)?"
-# # restorecon -R -v /etc/bacula/scripts
+# cd /etc/bacula/scripts
+# setenforce 0
+# tail -fn 0 /var/log/audit/audit.log | grep bacula > /etc/bacula/bacula-audit.log
+# * (run a backup job that has a pre-script)
+# chcon system_u:object_r:bacula_exec_t:s0 /etc/bacula/scripts
+# semanage fcontext -a -t bacula_exec_t "/etc/bacula/scripts(/.*)?"
+# restorecon -R -v /etc/bacula/scripts
 #        restorecon reset /etc/bacula/scripts/audit_linux_system.sh context unconfined_u:object_r:bacula_etc_t:s0->unconfined_u:object_r:bacula_exec_t:s0
 #        restorecon reset /etc/bacula/scripts/make_dumpall_pgsql.sh context unconfined_u:object_r:bacula_etc_t:s0->unconfined_u:object_r:bacula_exec_t:s0
 #        restorecon reset /etc/bacula/scripts/verify_dumpall_pgsql.sh context unconfined_u:object_r:bacula_etc_t:s0->unconfined_u:object_r:bacula_exec_t:s0
 #        restorecon reset /etc/bacula/scripts/delete_dumpall_pgsql.sh context unconfined_u:object_r:bacula_etc_t:s0->unconfined_u:object_r:bacula_exec_t:s0
 #        restorecon reset /etc/bacula/scripts/recovery_dumpall_pgsql.sh context unconfined_u:object_r:bacula_etc_t:s0->unconfined_u:object_r:bacula_exec_t:s0
-# # ls -lZ /etc/bacula/scripts
-# # cd /etc/bacula
-# # cat /etc/bacula/bacula-audit.log | audit2allow -M bacula_policy
-# # audit2allow -a
-# # audit2allow -a -M bacula_policy
-# # ...
-# # REVIEW: bacula_policy.te
-# # INSTALL POLISY:
-# # semodule -i bacula_policy.pp
-# # TEST: run another backup job, ensure you get no more AVC DENIED messages in /var/log/audit/audit.log
-# # ...
-# # REVIEW: bacula_policy.te
-# # INSTALL POLISY:
-# # semodule -i bacula_policy.pp
-# # TEST: run another backup job, ensure you get no more AVC DENIED messages in /var/log/audit/audit.log
-# # ...
-# # REVIEW: bacula_policy.te
-# # INSTALL POLISY:
-# # semodule -i bacula_policy.pp
-# # TEST: run another backup job, ensure you get no more AVC DENIED messages in /var/log/audit/audit.log
-# # ...
-# # DONE
-# # setenforce 1
+# ls -lZ /etc/bacula/scripts
+# cd /etc/bacula
+# cat /etc/bacula/bacula-audit.log | audit2allow -M bacula_policy
+# audit2allow -a
+# audit2allow -a -M bacula_policy
+# ...
+# REVIEW: bacula_policy.te
+# INSTALL POLISY:
+# semodule -i bacula_policy.pp
+# TEST: run another backup job, ensure you get no more AVC DENIED messages in /var/log/audit/audit.log
+# ...
+# REVIEW: bacula_policy.te
+# INSTALL POLISY:
+# semodule -i bacula_policy.pp
+# TEST: run another backup job, ensure you get no more AVC DENIED messages in /var/log/audit/audit.log
+# ...
+# REVIEW: bacula_policy.te
+# INSTALL POLISY:
+# semodule -i bacula_policy.pp
+# TEST: run another backup job, ensure you get no more AVC DENIED messages in /var/log/audit/audit.log
+# ...
+# DONE
+# setenforce 1
 #
 # Script Submitted and Deployment in production environments by:
 # Mykola Perehinets (mperehin)
@@ -73,7 +73,7 @@
 #
 #######################################################################################################################
 # Script modified date
-Version=27062017
+Version=04072017
 #
 #######################################################################################################################
 # Exit code
@@ -88,12 +88,10 @@ ADMIN="BaculaBackupOperators@localhost.localdomain"
 HOSTNAME=`hostname`
 #
 DATE=$(date +%Y-%m-%d_%H:%M)
-#DATE=$(date +%Y-%m-%d)
 #DATE_START=$(date +%H:%M)
 DATE_START=$(date +%Y-%m-%d_%H:%M)
 #
 # Store inventory log files in this folder
-#auditlogdir=/root
 #auditlogdir=/var/log
 auditlogdir=/etc/bacula/scripts
 #
@@ -249,6 +247,9 @@ echo "--------------------------------------------------------------------------
 echo "cat /etc/selinux/config:" >> $auditlogdir/server_inventory_$HOSTNAME.log
 cat /etc/selinux/config >> $auditlogdir/server_inventory_$HOSTNAME.log
 echo "-----------------------------------------------------------------------------------------------------------------" >> $auditlogdir/server_inventory_$HOSTNAME.log
+echo "cat /etc/audit/rules.d/audit.rules:" >> $auditlogdir/server_inventory_$HOSTNAME.log
+cat /etc/audit/rules.d/audit.rules >> $auditlogdir/server_inventory_$HOSTNAME.log
+echo "-----------------------------------------------------------------------------------------------------------------" >> $auditlogdir/server_inventory_$HOSTNAME.log
 echo "multipath -ll -v3:" >> $auditlogdir/server_inventory_$HOSTNAME.log
 multipath -ll -v3 >> $auditlogdir/server_inventory_$HOSTNAME.log
 echo "-----------------------------------------------------------------------------------------------------------------" >> $auditlogdir/server_inventory_$HOSTNAME.log
@@ -269,6 +270,9 @@ netstat -tulp >> $auditlogdir/server_inventory_$HOSTNAME.log
 echo "-----------------------------------------------------------------------------------------------------------------" >> $auditlogdir/server_inventory_$HOSTNAME.log
 echo "netstat -ntulp:" >> $auditlogdir/server_inventory_$HOSTNAME.log
 netstat -ntulp >> $auditlogdir/server_inventory_$HOSTNAME.log
+echo "-----------------------------------------------------------------------------------------------------------------" >> $auditlogdir/server_inventory_$HOSTNAME.log
+echo "ss -ntulp:" >> $auditlogdir/server_inventory_$HOSTNAME.log
+ss -ntulp >> $auditlogdir/server_inventory_$HOSTNAME.log
 echo "-----------------------------------------------------------------------------------------------------------------" >> $auditlogdir/server_inventory_$HOSTNAME.log
 echo "lsof -i -n:" >> $auditlogdir/server_inventory_$HOSTNAME.log
 lsof -i -n | egrep 'COMMAND|LISTEN|UDP' >> $auditlogdir/server_inventory_$HOSTNAME.log
@@ -324,6 +328,12 @@ echo "--------------------------------------------------------------------------
 echo "cat /root/.ssh/authorized_keys:" >> $auditlogdir/server_inventory_$HOSTNAME.log
 cat /root/.ssh/authorized_keys >> $auditlogdir/server_inventory_$HOSTNAME.log
 echo "-----------------------------------------------------------------------------------------------------------------" >> $auditlogdir/server_inventory_$HOSTNAME.log
+echo "cat /etc/ssh/sshd_config:" >> $auditlogdir/server_inventory_$HOSTNAME.log
+cat /etc/ssh/sshd_config >> $auditlogdir/server_inventory_$HOSTNAME.log
+echo "-----------------------------------------------------------------------------------------------------------------" >> $auditlogdir/server_inventory_$HOSTNAME.log
+echo "ac -p:" >> $auditlogdir/server_inventory_$HOSTNAME.log
+ac -p >> $auditlogdir/server_inventory_$HOSTNAME.log
+echo "-----------------------------------------------------------------------------------------------------------------" >> $auditlogdir/server_inventory_$HOSTNAME.log
 echo "egrep -v '.*:\*|:\!' /etc/shadow:" >> $auditlogdir/server_inventory_$HOSTNAME.log
 egrep -v '.*:\*|:\!' /etc/shadow | awk -F: '{print $1}' >> $auditlogdir/server_inventory_$HOSTNAME.log
 echo "-----------------------------------------------------------------------------------------------------------------" >> $auditlogdir/server_inventory_$HOSTNAME.log
@@ -378,11 +388,9 @@ echo "This data file is needed for Disaster Recovery Plan using in Corporate Bac
 # Sending copy of data to admins MailGroup
 msg="This is copy of inventory data on HOST: $HOSTNAME, verify at $DATE_START. This file is needed for recovery procedures... -->"
 #echo $msg
-#msg_body=`cat $auditlogdir/server_inventory_$HOSTNAME.log | sed "s/'/\n/g` > $auditlogdir/server_inventory_$HOSTNAME.log.win.txt
-#cat $auditlogdir/server_inventory_$HOSTNAME.log | sed "s/$/`echo -e \r`/" > $auditlogdir/server_inventory_$HOSTNAME.log.win.txt
-#awk '{sub(/$/,"\r");print}' $auditlogdir/server_inventory_$HOSTNAME.log > $auditlogdir/server_inventory_$HOSTNAME.log.win.txt
 #sed -e 's/$/\r/' $auditlogdir/server_inventory_$HOSTNAME.log | pigz --best --independent > $auditlogdir/server_inventory_$HOSTNAME.log.win.txt.gz
 sed -e 's/$/\r/' $auditlogdir/server_inventory_$HOSTNAME.log > $auditlogdir/server_inventory_$HOSTNAME.log.win.txt
+#msg_body=`cat $auditlogdir/server_inventory_$HOSTNAME.log | sed "s/'/\n/g` > $auditlogdir/server_inventory_$HOSTNAME.log.win.txt
 msg_body=`cat $auditlogdir/server_inventory_$HOSTNAME.log.win.txt`
 #echo $msg_body
 /bin/chmod 0644 $auditlogdir/server_inventory_$HOSTNAME.log.win.txt
