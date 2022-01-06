@@ -14,26 +14,26 @@
 ##
 #
 # Script installation:
-#
 # echo "cd /etc/bacula/scripts && git clone https://github.com/MykolaPerehinets/auditlinuxsystem.git"
 #
-# Script function: Audit Linux systems/services for correct backup process
+# Script function:
+# Audit and Inventory All Configurations files/Services on Linux servers/hosts (for Bacula Bare-Metal Recovery)
 #
-# Script requirements:
-# yum install bacula-client vim parted pciutils yum-plugin-security yum-plugin-verify yum-plugin-changelog lsusb lshw usbutils lsscsi pigz mlocate time glances tuned redhat-lsb-core etckeeper firewalld mailx policycoreutils-python policycoreutils-newrole policycoreutils-restorecond setools-console lsof iotop htop tree mutt psacct
+# Script requirements 1:
+# yum update && yum install bacula-client vim parted pciutils yum-plugin-security yum-plugin-verify yum-plugin-changelog lsusb lshw usbutils lsscsi pigz mlocate time glances tuned redhat-lsb-core etckeeper firewalld mailx policycoreutils-python policycoreutils-newrole policycoreutils-restorecond setools-console lsof iotop htop tree mutt psacct
 #
-# Addditional requirements: for initial etckeeper run next command from root
+# Script requirements 2: for initial setup the etckeeper, please run next command from root user
 # cd /etc
 # sudo etckeeper init
 # sudo etckeeper commit "Initial import"
 # git config --global user.name "root"
-# git config --global user.email root@"HOSTNAME"."DOMAIN"
+# git config --global user.email root@localhost.localdomain
 #
-# Addditional requirements: for initial bacula scripts run next command from root
+# Addditional requirements: for initial setup the bacula scripts, please run next command from root user
 # cd /etc/bacula/scripts
 # setenforce 0
 # tail -fn 0 /var/log/audit/audit.log | grep bacula > /etc/bacula/bacula-audit.log
-# * (run a backup job that has a pre-script)
+# * (run a simple backup job that has a pre-script)
 # chcon system_u:object_r:bacula_exec_t:s0 /etc/bacula/scripts
 # semanage fcontext -a -t bacula_exec_t "/etc/bacula/scripts(/.*)?"
 # restorecon -R -v /etc/bacula/scripts
@@ -66,14 +66,15 @@
 # DONE
 # setenforce 1
 #
-# Script Submitted and Deployment in production environments by:
+#
+# Script Submitted and Deployment in Production environments by:
 # Mykola Perehinets (mperehin)
 # Tel: +380 67 772 6910
 # mailto:mykola.perehinets@gmail.com
 #
 #######################################################################################################################
 # Script modified date
-Version=04072017
+Version=06012022
 #
 #######################################################################################################################
 # Exit code
@@ -81,7 +82,7 @@ ERR=0
 # Basic script configuration, etc...
 PATH=/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin
 #
-#ADMIN="root@"HOSTNAME"."DOMAIN""
+#ADMIN="root@localhost.localdomain"
 ADMIN="BaculaBackupOperators@localhost.localdomain"
 #
 #HOSTNAME=`hostname -s`
@@ -381,12 +382,12 @@ echo "##########################################################################
 #
 # Create and verify other parameters
 /bin/chmod 0644 $auditlogdir/server_inventory_$HOSTNAME.log
-echo "Create backup inventory data and store in $auditlogdir/server_inventory_$HOSTNAME.log"
-echo "This data file is needed for Disaster Recovery Plan using in Corporate Backup System Bacula!"
+echo "Create new backup inventory data and store in $auditlogdir/server_inventory_$HOSTNAME.log"
+echo "This audit/data file is needed for Disaster Recovery Plan using in Corporate Backup System Bacula!"
 #echo "OK... Audit your system has been DONE... Thank you..."
 #
-# Sending copy of data to admins MailGroup
-msg="This is copy of inventory data on HOST: $HOSTNAME, verify at $DATE_START. This file is needed for recovery procedures... -->"
+# Sending copy of data to DevOps MailGroup
+msg="This is copy of inventory data from HOST: $HOSTNAME, verify at $DATE_START. This audit/data file is needed for bare metal recovery procedures... -->"
 #echo $msg
 #sed -e 's/$/\r/' $auditlogdir/server_inventory_$HOSTNAME.log | pigz --best --independent > $auditlogdir/server_inventory_$HOSTNAME.log.win.txt.gz
 sed -e 's/$/\r/' $auditlogdir/server_inventory_$HOSTNAME.log > $auditlogdir/server_inventory_$HOSTNAME.log.win.txt
@@ -399,7 +400,7 @@ cd /
 #echo "$msg" | mail -s "WARNING: inventory of HOST: $HOSTNAME -->" -a $auditlogdir/server_inventory_$HOSTNAME.log.win.txt $ADMIN
 #echo -n $msg $msg_body | mail -s "WARNING: inventory of HOST: $HOSTNAME -->" $ADMIN
 echo -n $msg | mutt -s "WARNING: inventory of HOST: $HOSTNAME -->" -a $auditlogdir/server_inventory_$HOSTNAME.log.win.txt $ADMIN
-echo "Sending copy this data file to admins - MailGroup: $ADMIN "
+echo "Sending copy of this audit/data file to DevOps - MailGroup: $ADMIN "
 echo "OK... Very well... Please Start-up next Corporate Bacula Backup System procedures..."
 #
 # Exit code script status
