@@ -22,14 +22,16 @@
 # Script requirements 1:
 # yum update && yum install bacula-client vim parted pciutils yum-plugin-security yum-plugin-verify yum-plugin-changelog lsusb lshw usbutils lsscsi pigz mlocate time glances tuned redhat-lsb-core etckeeper firewalld mailx policycoreutils-python policycoreutils-newrole policycoreutils-restorecond setools-console lsof iotop htop tree mutt psacct
 #
-# Script requirements 2: for initial setup the etckeeper, please run next command from root user
+# Script requirements 2:
+# for initial setup the etckeeper, please run next command from root user
 # cd /etc
 # sudo etckeeper init
 # sudo etckeeper commit "Initial import"
 # git config --global user.name "root"
 # git config --global user.email root@localhost.localdomain
 #
-# Addditional requirements: for initial setup the bacula scripts, please run next command from root user
+# Additional requirements and enhancement:
+# for initial setup the bacula scripts, please run next command from root user
 # cd /etc/bacula/scripts
 # setenforce 0
 # tail -fn 0 /var/log/audit/audit.log | grep bacula > /etc/bacula/bacula-audit.log
@@ -67,6 +69,7 @@
 # setenforce 1
 #
 #
+#
 # Script Submitted and Deployment in Production environments by:
 # Mykola Perehinets (mperehin)
 # Tel: +380 67 772 6910
@@ -74,12 +77,13 @@
 #
 #######################################################################################################################
 # Script modified date
-Version=06012022
+Version=11012022
 #
 #######################################################################################################################
-# Exit code
+# Exit code status
 ERR=0
-# Basic script configuration, etc...
+#
+# Basic Script Configuration, deploy parameters, mail, etc...
 PATH=/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin
 #
 #ADMIN="root@localhost.localdomain"
@@ -99,7 +103,8 @@ auditlogdir=/etc/bacula/scripts
 #auditlogdirR=/RESTORE
 auditlogdirR=/RECOVERY
 #
-# Verify folders
+#######################################################################################################################
+# Verify all folders
 if [[ ! -e $auditlogdir ]]; then
     mkdir -p $auditlogdir
 elif [[ ! -d $auditlogdir ]]; then
@@ -113,6 +118,7 @@ elif [[ ! -d $auditlogdirR ]]; then
 fi
 #
 #######################################################################################################################
+# Run script
 cd $auditlogdir
 echo "WARNING: Please verify Script Version on your server HOST: $HOSTNAME"
 echo "OK... Audit your system has been START... Script Version in this server #$Version... "
@@ -386,7 +392,7 @@ echo "Create new backup inventory data and store in $auditlogdir/server_inventor
 echo "This audit/data file is needed for Disaster Recovery Plan using in Corporate Backup System Bacula!"
 #echo "OK... Audit your system has been DONE... Thank you..."
 #
-# Sending copy of data to DevOps MailGroup
+# Sending copy of audit/data to DevOps MailGroup
 msg="This is copy of inventory data from HOST: $HOSTNAME, verify at $DATE_START. This audit/data file is needed for bare metal recovery procedures... -->"
 #echo $msg
 #sed -e 's/$/\r/' $auditlogdir/server_inventory_$HOSTNAME.log | pigz --best --independent > $auditlogdir/server_inventory_$HOSTNAME.log.win.txt.gz
@@ -403,7 +409,7 @@ echo -n $msg | mutt -s "WARNING: inventory of HOST: $HOSTNAME -->" -a $auditlogd
 echo "Sending copy of this audit/data file to DevOps - MailGroup: $ADMIN "
 echo "OK... Very well... Please Start-up next Corporate Bacula Backup System procedures..."
 #
-# Exit code script status
+# Rial exit code status
 if [ "${ERR}" == "0" ]; then
 exit 0;
 else
