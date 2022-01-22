@@ -20,7 +20,7 @@
 # Audit and Inventory All Configurations files/Services on Linux servers/hosts (for Bacula Bare-Metal Recovery)
 #
 # Script requirements 1:
-#yum update && yum install bacula-client vim parted pciutils yum-plugin-security yum-plugin-verify yum-plugin-changelog lsusb lshw usbutils lsscsi pigz mlocate time glances tuned redhat-lsb-core etckeeper firewalld mailx policycoreutils-python policycoreutils-newrole policycoreutils-restorecond setools-console lsof iotop htop tree mutt psacct
+#yum update && yum install bacula-client vim parted pciutils yum-plugin-security yum-plugin-verify yum-plugin-changelog lsusb lshw usbutils lsscsi pigz mlocate time glances tuned redhat-lsb-core etckeeper firewalld mailx policycoreutils-python policycoreutils-newrole policycoreutils-restorecond setools-console lsof iotop htop tree mutt psacct hdparm 
 #
 # Script requirements 2:
 # for initial setup the etckeeper, please run next command from root user
@@ -52,17 +52,17 @@
 #audit2allow -a
 #audit2allow -a -M bacula_policy
 # ...
-# REVIEW: bacula_policy.te
+# TEST REVIEW: bacula_policy.te
 # INSTALL POLISY:
 #semodule -i bacula_policy.pp
 # TEST: run another backup job, ensure you get no more AVC DENIED messages in /var/log/audit/audit.log
 # ...
-# REVIEW: bacula_policy.te
+# TEST REVIEW: bacula_policy.te
 # INSTALL POLISY:
 #semodule -i bacula_policy.pp
 # TEST: run another backup job, ensure you get no more AVC DENIED messages in /var/log/audit/audit.log
 # ...
-# REVIEW: bacula_policy.te
+# TEST REVIEW: bacula_policy.te
 # INSTALL POLISY:
 #semodule -i bacula_policy.pp
 # TEST: run another backup job, ensure you get no more AVC DENIED messages in /var/log/audit/audit.log
@@ -75,7 +75,7 @@
 # Script Submitted and Deployment in Production environments by:
 # Mykola Perehinets (mperehin)
 # Tel: +380 67 772 6910
-# mailto: mykola.perehinets@gmail.com
+# Mailto: mykola.perehinets@gmail.com
 #
 #######################################################################################################################
 # Script modified date
@@ -102,6 +102,7 @@ DATE_START=$(date +%Y-%m-%d_%H:%M)
 #auditlogdir=/root
 #auditlogdir=/var/log
 auditlogdir=/etc/bacula/scripts
+#auditlogdirR=/OUTPUT
 #auditlogdirR=/RESTORE
 auditlogdirR=/RECOVERY
 #
@@ -215,6 +216,15 @@ echo "--------------------------------------------------------------------------
 echo "cat /proc/partitions:" >> $auditlogdir/server_inventory_$HOSTNAME.log
 cat /proc/partitions >> $auditlogdir/server_inventory_$HOSTNAME.log
 echo "-----------------------------------------------------------------------------------------------------------------" >> $auditlogdir/server_inventory_$HOSTNAME.log
+echo "hdparm -i /dev/sda:" >> $auditlogdir/server_inventory_$HOSTNAME.log
+sudo hdparm -i /dev/sda >> $auditlogdir/server_inventory_$HOSTNAME.log
+echo "-----------------------------------------------------------------------------------------------------------------" >> $auditlogdir/server_inventory_$HOSTNAME.log
+echo "hdparm -Tt /dev/sda2:" >> $auditlogdir/server_inventory_$HOSTNAME.log
+sudo hdparm -Tt /dev/sda2 >> $auditlogdir/server_inventory_$HOSTNAME.log
+echo "-----------------------------------------------------------------------------------------------------------------" >> $auditlogdir/server_inventory_$HOSTNAME.log
+echo "hdparm -t --direct --offset 256 /dev/sda1:" >> $auditlogdir/server_inventory_$HOSTNAME.log
+sudo hdparm -t --direct --offset 256 /dev/sda1 >> $auditlogdir/server_inventory_$HOSTNAME.log
+echo "-----------------------------------------------------------------------------------------------------------------" >> $auditlogdir/server_inventory_$HOSTNAME.log
 echo "cat /proc/cpuinfo:" >> $auditlogdir/server_inventory_$HOSTNAME.log
 cat /proc/cpuinfo >> $auditlogdir/server_inventory_$HOSTNAME.log
 echo "-----------------------------------------------------------------------------------------------------------------" >> $auditlogdir/server_inventory_$HOSTNAME.log
@@ -223,6 +233,12 @@ cat /proc/meminfo >> $auditlogdir/server_inventory_$HOSTNAME.log
 echo "-----------------------------------------------------------------------------------------------------------------" >> $auditlogdir/server_inventory_$HOSTNAME.log
 echo "free -h:" >> $auditlogdir/server_inventory_$HOSTNAME.log
 free -h >> $auditlogdir/server_inventory_$HOSTNAME.log
+echo "-----------------------------------------------------------------------------------------------------------------" >> $auditlogdir/server_inventory_$HOSTNAME.log
+echo "cat /proc/sys/kernel/shmmax:" >> $auditlogdir/server_inventory_$HOSTNAME.log
+cat /proc/sys/kernel/shmmax >> $auditlogdir/server_inventory_$HOSTNAME.log
+echo "-----------------------------------------------------------------------------------------------------------------" >> $auditlogdir/server_inventory_$HOSTNAME.log
+echo "sysctl -a | grep shm:" >> $auditlogdir/server_inventory_$HOSTNAME.log
+sudo sysctl -a | grep shm >> $auditlogdir/server_inventory_$HOSTNAME.log
 echo "-----------------------------------------------------------------------------------------------------------------" >> $auditlogdir/server_inventory_$HOSTNAME.log
 echo "cat /proc/devices:" >> $auditlogdir/server_inventory_$HOSTNAME.log
 cat /proc/devices >> $auditlogdir/server_inventory_$HOSTNAME.log
@@ -309,7 +325,7 @@ echo "lsof -i -n:" >> $auditlogdir/server_inventory_$HOSTNAME.log
 lsof -i -n | egrep 'COMMAND|LISTEN|UDP' >> $auditlogdir/server_inventory_$HOSTNAME.log
 echo "-----------------------------------------------------------------------------------------------------------------" >> $auditlogdir/server_inventory_$HOSTNAME.log
 echo "lsof:" >> $auditlogdir/server_inventory_$HOSTNAME.log
-lsof >> $auditlogdir/server_inventory_$HOSTNAME.log
+sudo lsof >> $auditlogdir/server_inventory_$HOSTNAME.log
 echo "-----------------------------------------------------------------------------------------------------------------" >> $auditlogdir/server_inventory_$HOSTNAME.log
 echo "iptables --list:" >> $auditlogdir/server_inventory_$HOSTNAME.log
 iptables --list >> $auditlogdir/server_inventory_$HOSTNAME.log
@@ -352,6 +368,9 @@ cat /etc/rsyslog.conf >> $auditlogdir/server_inventory_$HOSTNAME.log
 echo "-----------------------------------------------------------------------------------------------------------------" >> $auditlogdir/server_inventory_$HOSTNAME.log
 echo "cat /var/log/yum.log:" >> $auditlogdir/server_inventory_$HOSTNAME.log
 cat /var/log/yum.log >> $auditlogdir/server_inventory_$HOSTNAME.log
+echo "-----------------------------------------------------------------------------------------------------------------" >> $auditlogdir/server_inventory_$HOSTNAME.log
+echo "cat /var/log/dnf.log:" >> $auditlogdir/server_inventory_$HOSTNAME.log
+cat /var/log/dnf.log >> $auditlogdir/server_inventory_$HOSTNAME.log
 echo "-----------------------------------------------------------------------------------------------------------------" >> $auditlogdir/server_inventory_$HOSTNAME.log
 echo "cat /etc/sysctl.ktune:" >> $auditlogdir/server_inventory_$HOSTNAME.log
 cat /etc/sysctl.ktune >> $auditlogdir/server_inventory_$HOSTNAME.log
@@ -413,6 +432,24 @@ echo "--------------------------------------------------------------------------
 echo "ls -l /:" >> $auditlogdir/server_inventory_$HOSTNAME.log
 ls -l / >> $auditlogdir/server_inventory_$HOSTNAME.log
 echo "-----------------------------------------------------------------------------------------------------------------" >> $auditlogdir/server_inventory_$HOSTNAME.log
+echo "ls -l /var/log/:" >> $auditlogdir/server_inventory_$HOSTNAME.log
+ls -l /var/log/ >> $auditlogdir/server_inventory_$HOSTNAME.log
+echo "-----------------------------------------------------------------------------------------------------------------" >> $auditlogdir/server_inventory_$HOSTNAME.log
+echo "tail -n 1000 /var/log/messages:" >> $auditlogdir/server_inventory_$HOSTNAME.log
+tail -n 1000 /var/log/messages >> $auditlogdir/server_inventory_$HOSTNAME.log
+echo "-----------------------------------------------------------------------------------------------------------------" >> $auditlogdir/server_inventory_$HOSTNAME.log
+echo "tail -n 500 /var/log/kern.log:" >> $auditlogdir/server_inventory_$HOSTNAME.log
+tail -n 500 /var/log/kern.log >> $auditlogdir/server_inventory_$HOSTNAME.log
+echo "-----------------------------------------------------------------------------------------------------------------" >> $auditlogdir/server_inventory_$HOSTNAME.log
+echo "tail -n 500 /var/log/auth.log:" >> $auditlogdir/server_inventory_$HOSTNAME.log
+tail -n 500 /var/log/auth.log >> $auditlogdir/server_inventory_$HOSTNAME.log
+echo "-----------------------------------------------------------------------------------------------------------------" >> $auditlogdir/server_inventory_$HOSTNAME.log
+echo "w:" >> $auditlogdir/server_inventory_$HOSTNAME.log
+w >> $auditlogdir/server_inventory_$HOSTNAME.log
+echo "-----------------------------------------------------------------------------------------------------------------" >> $auditlogdir/server_inventory_$HOSTNAME.log
+echo "who:" >> $auditlogdir/server_inventory_$HOSTNAME.log
+who >> $auditlogdir/server_inventory_$HOSTNAME.log
+echo "-----------------------------------------------------------------------------------------------------------------" >> $auditlogdir/server_inventory_$HOSTNAME.log
 echo "" >> $auditlogdir/server_inventory_$HOSTNAME.log
 echo "hostname:" >> $auditlogdir/server_inventory_$HOSTNAME.log
 hostname  >> $auditlogdir/server_inventory_$HOSTNAME.log
@@ -461,3 +498,4 @@ exit 1;
 fi
 #
 #echo "OK... Audit your system has been DONE... Thank you..."
+
