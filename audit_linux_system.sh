@@ -14,78 +14,81 @@
 ##
 #
 # Script installation:
-# echo "cd /etc/bacula/scripts && git clone https://github.com/MykolaPerehinets/auditlinuxsystem.git"
+#echo "cd /etc/bacula/scripts && git clone https://github.com/MykolaPerehinets/auditlinuxsystem.git"
 #
 # Script function:
 # Audit and Inventory All Configurations files/Services on Linux servers/hosts (for Bacula Bare-Metal Recovery)
 #
 # Script requirements 1:
-# yum update && yum install bacula-client vim parted pciutils yum-plugin-security yum-plugin-verify yum-plugin-changelog lsusb lshw usbutils lsscsi pigz mlocate time glances tuned redhat-lsb-core etckeeper firewalld mailx policycoreutils-python policycoreutils-newrole policycoreutils-restorecond setools-console lsof iotop htop tree mutt psacct
+#yum update && yum install bacula-client vim parted pciutils yum-plugin-security yum-plugin-verify yum-plugin-changelog lsusb lshw usbutils lsscsi pigz mlocate time glances tuned redhat-lsb-core etckeeper firewalld mailx policycoreutils-python policycoreutils-newrole policycoreutils-restorecond setools-console lsof iotop htop tree mutt psacct
 #
 # Script requirements 2:
 # for initial setup the etckeeper, please run next command from root user
-# cd /etc
-# sudo etckeeper init
-# sudo etckeeper commit "Initial import"
-# git config --global user.name "root"
-# git config --global user.email root@localhost.localdomain
+#cd /etc
+#sudo etckeeper init
+#sudo etckeeper commit "Initial import"
+#git config --global user.name "root"
+#git config --global user.email root@localhost.localdomain
 #
 # Additional requirements and enhancement:
 # for initial setup the bacula scripts, please run next command from root user
-# cd /etc/bacula/scripts
-# setenforce 0
-# tail -fn 0 /var/log/audit/audit.log | grep bacula > /etc/bacula/bacula-audit.log
+#cd /etc/bacula/scripts
+#setenforce 0
+#tail -fn 0 /var/log/audit/audit.log | grep bacula > /etc/bacula/bacula-audit.log
+#
 # * (run a simple backup job that has a pre-script)
-# chcon system_u:object_r:bacula_exec_t:s0 /etc/bacula/scripts
-# semanage fcontext -a -t bacula_exec_t "/etc/bacula/scripts(/.*)?"
-# restorecon -R -v /etc/bacula/scripts
+#
+#chcon system_u:object_r:bacula_exec_t:s0 /etc/bacula/scripts
+#semanage fcontext -a -t bacula_exec_t "/etc/bacula/scripts(/.*)?"
+#restorecon -R -v /etc/bacula/scripts
 #        restorecon reset /etc/bacula/scripts/audit_linux_system.sh context unconfined_u:object_r:bacula_etc_t:s0->unconfined_u:object_r:bacula_exec_t:s0
 #        restorecon reset /etc/bacula/scripts/make_dumpall_pgsql.sh context unconfined_u:object_r:bacula_etc_t:s0->unconfined_u:object_r:bacula_exec_t:s0
 #        restorecon reset /etc/bacula/scripts/verify_dumpall_pgsql.sh context unconfined_u:object_r:bacula_etc_t:s0->unconfined_u:object_r:bacula_exec_t:s0
 #        restorecon reset /etc/bacula/scripts/delete_dumpall_pgsql.sh context unconfined_u:object_r:bacula_etc_t:s0->unconfined_u:object_r:bacula_exec_t:s0
 #        restorecon reset /etc/bacula/scripts/recovery_dumpall_pgsql.sh context unconfined_u:object_r:bacula_etc_t:s0->unconfined_u:object_r:bacula_exec_t:s0
-# ls -lZ /etc/bacula/scripts
-# cd /etc/bacula
-# cat /etc/bacula/bacula-audit.log | audit2allow -M bacula_policy
-# audit2allow -a
-# audit2allow -a -M bacula_policy
+#ls -lZ /etc/bacula/scripts
+#cd /etc/bacula
+#cat /etc/bacula/bacula-audit.log | audit2allow -M bacula_policy
+#audit2allow -a
+#audit2allow -a -M bacula_policy
 # ...
 # REVIEW: bacula_policy.te
 # INSTALL POLISY:
-# semodule -i bacula_policy.pp
+#semodule -i bacula_policy.pp
 # TEST: run another backup job, ensure you get no more AVC DENIED messages in /var/log/audit/audit.log
 # ...
 # REVIEW: bacula_policy.te
 # INSTALL POLISY:
-# semodule -i bacula_policy.pp
+#semodule -i bacula_policy.pp
 # TEST: run another backup job, ensure you get no more AVC DENIED messages in /var/log/audit/audit.log
 # ...
 # REVIEW: bacula_policy.te
 # INSTALL POLISY:
-# semodule -i bacula_policy.pp
+#semodule -i bacula_policy.pp
 # TEST: run another backup job, ensure you get no more AVC DENIED messages in /var/log/audit/audit.log
 # ...
 # DONE
-# setenforce 1
+#setenforce 1
 #
 #
 #
 # Script Submitted and Deployment in Production environments by:
 # Mykola Perehinets (mperehin)
 # Tel: +380 67 772 6910
-# mailto:mykola.perehinets@gmail.com
+# mailto: mykola.perehinets@gmail.com
 #
 #######################################################################################################################
 # Script modified date
-Version=11012022
+Version=22012022
 #
 #######################################################################################################################
 # Exit code status
 ERR=0
 #
-# Basic Script Configuration, deploy parameters, mail, etc...
+# Basic Script Configuration, deploy needed parameters, variables, mail, etc.
 PATH=/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin
 #
+# DevOps MailGroup
 #ADMIN="root@localhost.localdomain"
 ADMIN="BaculaBackupOperators@localhost.localdomain"
 #
@@ -93,18 +96,17 @@ ADMIN="BaculaBackupOperators@localhost.localdomain"
 HOSTNAME=`hostname`
 #
 DATE=$(date +%Y-%m-%d_%H:%M)
-#DATE_START=$(date +%H:%M)
 DATE_START=$(date +%Y-%m-%d_%H:%M)
 #
-# Store inventory log files in this folder
+# Stored inventory logs files in this folder
+#auditlogdir=/root
 #auditlogdir=/var/log
 auditlogdir=/etc/bacula/scripts
-#
 #auditlogdirR=/RESTORE
 auditlogdirR=/RECOVERY
 #
 #######################################################################################################################
-# Verify all folders
+# Verifying all needed folders/directories
 if [[ ! -e $auditlogdir ]]; then
     mkdir -p $auditlogdir
 elif [[ ! -d $auditlogdir ]]; then
@@ -121,12 +123,14 @@ fi
 # Run script
 cd $auditlogdir
 echo "WARNING: Please verify Script Version on your server HOST: $HOSTNAME"
-echo "OK... Audit your system has been START... Script Version in this server #$Version... "
+echo "OK... Audit your system has been STARTING... Script Version in this server #$Version... "
 echo "####################################################################################"
-echo "OK... Audit your system has been start at $DATE_START... Script Version #$Version..." > $auditlogdir/server_inventory_$HOSTNAME.log
+echo "OK... Audit your system has been starting at $DATE_START... Script Version in this server #$Version..." > $auditlogdir/server_inventory_$HOSTNAME.log
 echo "#################################################################################################################" >> $auditlogdir/server_inventory_$HOSTNAME.log
 echo "Inventory audit for server/hostname:" >> $auditlogdir/server_inventory_$HOSTNAME.log
+#echo "hostname:" >> $auditlogdir/server_inventory_$HOSTNAME.log
 hostname >> $auditlogdir/server_inventory_$HOSTNAME.log
+echo "" >> $auditlogdir/server_inventory_$HOSTNAME.log
 ifconfig | grep inet >> $auditlogdir/server_inventory_$HOSTNAME.log
 ifconfig | grep ether >> $auditlogdir/server_inventory_$HOSTNAME.log
 echo "" >> $auditlogdir/server_inventory_$HOSTNAME.log
@@ -134,8 +138,7 @@ echo "This script was started from user $USER" >> $auditlogdir/server_inventory_
 echo "Your home directory is $HOME" >> $auditlogdir/server_inventory_$HOSTNAME.log
 echo "Your mail INBOX is located in $MAIL" >> $auditlogdir/server_inventory_$HOSTNAME.log
 echo "#################################################################################################################" >> $auditlogdir/server_inventory_$HOSTNAME.log
-echo "" >> $auditlogdir/server_inventory_$HOSTNAME.log
-echo "" >> $auditlogdir/server_inventory_$HOSTNAME.log
+#echo "" >> $auditlogdir/server_inventory_$HOSTNAME.log
 echo "cat /etc/redhat-release:" >> $auditlogdir/server_inventory_$HOSTNAME.log
 cat /etc/redhat-release >> $auditlogdir/server_inventory_$HOSTNAME.log
 echo "-----------------------------------------------------------------------------------------------------------------" >> $auditlogdir/server_inventory_$HOSTNAME.log
@@ -218,6 +221,9 @@ echo "--------------------------------------------------------------------------
 echo "cat /proc/meminfo:" >> $auditlogdir/server_inventory_$HOSTNAME.log
 cat /proc/meminfo >> $auditlogdir/server_inventory_$HOSTNAME.log
 echo "-----------------------------------------------------------------------------------------------------------------" >> $auditlogdir/server_inventory_$HOSTNAME.log
+echo "free -h:" >> $auditlogdir/server_inventory_$HOSTNAME.log
+free -h >> $auditlogdir/server_inventory_$HOSTNAME.log
+echo "-----------------------------------------------------------------------------------------------------------------" >> $auditlogdir/server_inventory_$HOSTNAME.log
 echo "cat /proc/devices:" >> $auditlogdir/server_inventory_$HOSTNAME.log
 cat /proc/devices >> $auditlogdir/server_inventory_$HOSTNAME.log
 echo "-----------------------------------------------------------------------------------------------------------------" >> $auditlogdir/server_inventory_$HOSTNAME.log
@@ -275,8 +281,26 @@ echo "--------------------------------------------------------------------------
 echo "netstat -tulp:" >> $auditlogdir/server_inventory_$HOSTNAME.log
 netstat -tulp >> $auditlogdir/server_inventory_$HOSTNAME.log
 echo "-----------------------------------------------------------------------------------------------------------------" >> $auditlogdir/server_inventory_$HOSTNAME.log
+echo "netstat -at:" >> $auditlogdir/server_inventory_$HOSTNAME.log
+netstat -at >> $auditlogdir/server_inventory_$HOSTNAME.log
+echo "-----------------------------------------------------------------------------------------------------------------" >> $auditlogdir/server_inventory_$HOSTNAME.log
+echo "netstat -au:" >> $auditlogdir/server_inventory_$HOSTNAME.log
+netstat -au >> $auditlogdir/server_inventory_$HOSTNAME.log
+echo "-----------------------------------------------------------------------------------------------------------------" >> $auditlogdir/server_inventory_$HOSTNAME.log
 echo "netstat -ntulp:" >> $auditlogdir/server_inventory_$HOSTNAME.log
 netstat -ntulp >> $auditlogdir/server_inventory_$HOSTNAME.log
+echo "-----------------------------------------------------------------------------------------------------------------" >> $auditlogdir/server_inventory_$HOSTNAME.log
+echo "netstat -rn:" >> $auditlogdir/server_inventory_$HOSTNAME.log
+netstat -rn >> $auditlogdir/server_inventory_$HOSTNAME.log
+echo "-----------------------------------------------------------------------------------------------------------------" >> $auditlogdir/server_inventory_$HOSTNAME.log
+echo "netstat -lnptux:" >> $auditlogdir/server_inventory_$HOSTNAME.log
+netstat -lnptux >> $auditlogdir/server_inventory_$HOSTNAME.log
+echo "-----------------------------------------------------------------------------------------------------------------" >> $auditlogdir/server_inventory_$HOSTNAME.log
+echo "netstat -s:" >> $auditlogdir/server_inventory_$HOSTNAME.log
+netstat -s >> $auditlogdir/server_inventory_$HOSTNAME.log
+echo "-----------------------------------------------------------------------------------------------------------------" >> $auditlogdir/server_inventory_$HOSTNAME.log
+echo "netstat -ate:" >> $auditlogdir/server_inventory_$HOSTNAME.log
+netstat -ate | grep -v LISTEN | grep -v CONNECTED | awk '{print$5}' | sed 's/[0-9]\+$//' | sort | uniq -c >> $auditlogdir/server_inventory_$HOSTNAME.log
 echo "-----------------------------------------------------------------------------------------------------------------" >> $auditlogdir/server_inventory_$HOSTNAME.log
 echo "ss -ntulp:" >> $auditlogdir/server_inventory_$HOSTNAME.log
 ss -ntulp >> $auditlogdir/server_inventory_$HOSTNAME.log
@@ -284,8 +308,8 @@ echo "--------------------------------------------------------------------------
 echo "lsof -i -n:" >> $auditlogdir/server_inventory_$HOSTNAME.log
 lsof -i -n | egrep 'COMMAND|LISTEN|UDP' >> $auditlogdir/server_inventory_$HOSTNAME.log
 echo "-----------------------------------------------------------------------------------------------------------------" >> $auditlogdir/server_inventory_$HOSTNAME.log
-echo "netstat -ate:" >> $auditlogdir/server_inventory_$HOSTNAME.log
-netstat -ate | grep -v LISTEN | grep -v CONNECTED | awk '{print$5}' | sed 's/[0-9]\+$//' | sort | uniq -c >> $auditlogdir/server_inventory_$HOSTNAME.log
+echo "lsof:" >> $auditlogdir/server_inventory_$HOSTNAME.log
+lsof >> $auditlogdir/server_inventory_$HOSTNAME.log
 echo "-----------------------------------------------------------------------------------------------------------------" >> $auditlogdir/server_inventory_$HOSTNAME.log
 echo "iptables --list:" >> $auditlogdir/server_inventory_$HOSTNAME.log
 iptables --list >> $auditlogdir/server_inventory_$HOSTNAME.log
@@ -308,8 +332,17 @@ echo "--------------------------------------------------------------------------
 echo "cat /etc/hosts:" >> $auditlogdir/server_inventory_$HOSTNAME.log
 cat /etc/hosts >> $auditlogdir/server_inventory_$HOSTNAME.log
 echo "-----------------------------------------------------------------------------------------------------------------" >> $auditlogdir/server_inventory_$HOSTNAME.log
+echo "ls -l /etc/sysctl.d/:" >> $auditlogdir/server_inventory_$HOSTNAME.log
+ls -l /etc/sysctl.d/ >> $auditlogdir/server_inventory_$HOSTNAME.log
+echo "-----------------------------------------------------------------------------------------------------------------" >> $auditlogdir/server_inventory_$HOSTNAME.log
 echo "cat /etc/sysctl.conf:" >> $auditlogdir/server_inventory_$HOSTNAME.log
 cat /etc/sysctl.conf >> $auditlogdir/server_inventory_$HOSTNAME.log
+echo "-----------------------------------------------------------------------------------------------------------------" >> $auditlogdir/server_inventory_$HOSTNAME.log
+echo "sysctl -p:" >> $auditlogdir/server_inventory_$HOSTNAME.log
+sudo sysctl -p >> $auditlogdir/server_inventory_$HOSTNAME.log
+echo "-----------------------------------------------------------------------------------------------------------------" >> $auditlogdir/server_inventory_$HOSTNAME.log
+echo "sysctl -a:" >> $auditlogdir/server_inventory_$HOSTNAME.log
+sudo sysctl -a >> $auditlogdir/server_inventory_$HOSTNAME.log
 echo "-----------------------------------------------------------------------------------------------------------------" >> $auditlogdir/server_inventory_$HOSTNAME.log
 echo "cat /etc/rc.local:" >> $auditlogdir/server_inventory_$HOSTNAME.log
 cat /etc/rc.local >> $auditlogdir/server_inventory_$HOSTNAME.log
@@ -338,8 +371,17 @@ echo "--------------------------------------------------------------------------
 echo "cat /etc/ssh/sshd_config:" >> $auditlogdir/server_inventory_$HOSTNAME.log
 cat /etc/ssh/sshd_config >> $auditlogdir/server_inventory_$HOSTNAME.log
 echo "-----------------------------------------------------------------------------------------------------------------" >> $auditlogdir/server_inventory_$HOSTNAME.log
+echo "cat /etc/ssh/ssh_config:" >> $auditlogdir/server_inventory_$HOSTNAME.log
+cat /etc/ssh/ssh_config >> $auditlogdir/server_inventory_$HOSTNAME.log
+echo "-----------------------------------------------------------------------------------------------------------------" >> $auditlogdir/server_inventory_$HOSTNAME.log
 echo "ac -p:" >> $auditlogdir/server_inventory_$HOSTNAME.log
 ac -p >> $auditlogdir/server_inventory_$HOSTNAME.log
+echo "-----------------------------------------------------------------------------------------------------------------" >> $auditlogdir/server_inventory_$HOSTNAME.log
+echo "ac -d -y:" >> $auditlogdir/server_inventory_$HOSTNAME.log
+ac -d -y >> $auditlogdir/server_inventory_$HOSTNAME.log
+echo "-----------------------------------------------------------------------------------------------------------------" >> $auditlogdir/server_inventory_$HOSTNAME.log
+echo "sa --print-users:" >> $auditlogdir/server_inventory_$HOSTNAME.log
+sudo sa --print-users >> $auditlogdir/server_inventory_$HOSTNAME.log
 echo "-----------------------------------------------------------------------------------------------------------------" >> $auditlogdir/server_inventory_$HOSTNAME.log
 echo "egrep -v '.*:\*|:\!' /etc/shadow:" >> $auditlogdir/server_inventory_$HOSTNAME.log
 egrep -v '.*:\*|:\!' /etc/shadow | awk -F: '{print $1}' >> $auditlogdir/server_inventory_$HOSTNAME.log
@@ -382,15 +424,17 @@ echo "etckeeper daily commit:" >> $auditlogdir/server_inventory_$HOSTNAME.log
 etckeeper commit "Update information about all files and configurations in /etc folder. State at $DATE" >> $auditlogdir/server_inventory_$HOSTNAME.log
 sleep 5
 echo "-----------------------------------------------------------------------------------------------------------------" >> $auditlogdir/server_inventory_$HOSTNAME.log
+#echo "" >> $auditlogdir/server_inventory_$HOSTNAME.log
 echo "End of File" >> $auditlogdir/server_inventory_$HOSTNAME.log
+echo "#################################################################################################################" >> $auditlogdir/server_inventory_$HOSTNAME.log
+#echo "" >> $auditlogdir/server_inventory_$HOSTNAME.log
 #
 echo "####################################################################################"
 #
 # Create and verify other parameters
 /bin/chmod 0644 $auditlogdir/server_inventory_$HOSTNAME.log
-echo "Create new backup inventory data and store in $auditlogdir/server_inventory_$HOSTNAME.log"
-echo "This audit/data file is needed for Disaster Recovery Plan using in Corporate Backup System Bacula!"
-#echo "OK... Audit your system has been DONE... Thank you..."
+echo "Creating the backup inventory data and storing it in a $auditlogdir/server_inventory_$HOSTNAME.log"
+echo "This audit/data file is needed for the Disaster Recovery Plan using in Corporate Backup System Bacula!"
 #
 # Sending copy of audit/data to DevOps MailGroup
 msg="This is copy of inventory data from HOST: $HOSTNAME, verify at $DATE_START. This audit/data file is needed for bare metal recovery procedures... -->"
@@ -406,8 +450,8 @@ cd /
 #echo "$msg" | mail -s "WARNING: inventory of HOST: $HOSTNAME -->" -a $auditlogdir/server_inventory_$HOSTNAME.log.win.txt $ADMIN
 #echo -n $msg $msg_body | mail -s "WARNING: inventory of HOST: $HOSTNAME -->" $ADMIN
 echo -n $msg | mutt -s "WARNING: inventory of HOST: $HOSTNAME -->" -a $auditlogdir/server_inventory_$HOSTNAME.log.win.txt $ADMIN
-echo "Sending copy of this audit/data file to DevOps - MailGroup: $ADMIN "
-echo "OK... Very well... Please Start-up next Corporate Bacula Backup System procedures..."
+echo "Sending copy of this audit/data file to DevOps MailGroup: $ADMIN "
+echo "OK... Very well... Please start up the next Corporate Bacula Backup System procedures..."
 #
 # Rial exit code status
 if [ "${ERR}" == "0" ]; then
@@ -415,4 +459,5 @@ exit 0;
 else
 exit 1;
 fi
-
+#
+#echo "OK... Audit your system has been DONE... Thank you..."
