@@ -7,8 +7,7 @@ Unfortunately, many of the steps one must take before and immediately after a di
 Installation is very simple:
 Please use for ALL action root account!
 
-cd /etc/bacula/scripts   &&   git clone https://github.com/MykolaPerehinets/auditlinuxsystem.git
-./audit_linux_system.sh
+cd /etc/bacula/scripts && git clone https://github.com/MykolaPerehinets/auditlinuxsystem.git && ./audit_linux_system.sh
 
 
 Verified on Centos, Ubuntu...
