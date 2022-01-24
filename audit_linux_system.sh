@@ -18,7 +18,7 @@
 #
 # Script function:
 # Audit and Inventory All Configurations files/Services on Linux servers/hosts (for Bacula Bare-Metal Recovery)
-# Please use for this action root account
+# Please use for this action root account!
 #
 # Script requirements 1:
 #yum update && yum install bacula-client vim parted pciutils yum-plugin-security yum-plugin-verify yum-plugin-changelog lsusb lshw usbutils lsscsi pigz mlocate time glances tuned redhat-lsb-core etckeeper firewalld mailx policycoreutils-python policycoreutils-newrole policycoreutils-restorecond setools-console lsof iotop htop tree mutt psacct hdparm 
@@ -80,7 +80,7 @@
 #
 #######################################################################################################################
 # Script modified date
-Version=23012022
+Version=24012022
 #
 #######################################################################################################################
 # Exit code status
@@ -130,7 +130,7 @@ echo "##########################################################################
 echo "OK... Audit your system has been starting at $DATE_START... Script Version in this server #$Version..." > $auditlogdir/server_inventory_$HOSTNAME.log
 echo "#################################################################################################################" >> $auditlogdir/server_inventory_$HOSTNAME.log
 echo "Inventory audit for server/hostname:" >> $auditlogdir/server_inventory_$HOSTNAME.log
-#echo "hostname:" >> $auditlogdir/server_inventory_$HOSTNAME.log
+echo "" >> $auditlogdir/server_inventory_$HOSTNAME.log
 hostname >> $auditlogdir/server_inventory_$HOSTNAME.log
 echo "" >> $auditlogdir/server_inventory_$HOSTNAME.log
 ifconfig | grep inet >> $auditlogdir/server_inventory_$HOSTNAME.log
@@ -143,6 +143,7 @@ echo "##########################################################################
 #echo "" >> $auditlogdir/server_inventory_$HOSTNAME.log
 echo "cat /etc/redhat-release:" >> $auditlogdir/server_inventory_$HOSTNAME.log
 cat /etc/redhat-release >> $auditlogdir/server_inventory_$HOSTNAME.log
+#echo "" >> $auditlogdir/server_inventory_$HOSTNAME.log
 echo "-----------------------------------------------------------------------------------------------------------------" >> $auditlogdir/server_inventory_$HOSTNAME.log
 echo "cat /etc/lsb-release:" >> $auditlogdir/server_inventory_$HOSTNAME.log
 cat /etc/lsb-release >> $auditlogdir/server_inventory_$HOSTNAME.log
@@ -164,7 +165,6 @@ cat /boot/grub2/device.map >> $auditlogdir/server_inventory_$HOSTNAME.log
 echo "-----------------------------------------------------------------------------------------------------------------" >> $auditlogdir/server_inventory_$HOSTNAME.log
 echo "cat /boot/grub2/grubenv:" >> $auditlogdir/server_inventory_$HOSTNAME.log
 cat /boot/grub2/grubenv >> $auditlogdir/server_inventory_$HOSTNAME.log
-echo ""
 echo "-----------------------------------------------------------------------------------------------------------------" >> $auditlogdir/server_inventory_$HOSTNAME.log
 echo "cat /boot/grub2/grub.*:" >> $auditlogdir/server_inventory_$HOSTNAME.log
 cat /boot/grub2/grub.* >> $auditlogdir/server_inventory_$HOSTNAME.log
@@ -222,15 +222,18 @@ cat /proc/partitions >> $auditlogdir/server_inventory_$HOSTNAME.log
 echo "-----------------------------------------------------------------------------------------------------------------" >> $auditlogdir/server_inventory_$HOSTNAME.log
 echo "hdparm -i /dev/sda:" >> $auditlogdir/server_inventory_$HOSTNAME.log
 hdparm -i /dev/sda >> $auditlogdir/server_inventory_$HOSTNAME.log
+echo "" >> $auditlogdir/server_inventory_$HOSTNAME.log
 echo "-----------------------------------------------------------------------------------------------------------------" >> $auditlogdir/server_inventory_$HOSTNAME.log
 echo "hdparm -Tt /dev/sda2:" >> $auditlogdir/server_inventory_$HOSTNAME.log
 hdparm -Tt /dev/sda2 >> $auditlogdir/server_inventory_$HOSTNAME.log
 echo "-----------------------------------------------------------------------------------------------------------------" >> $auditlogdir/server_inventory_$HOSTNAME.log
-echo "hdparm -t --direct --offset 256 /dev/sda1:" >> $auditlogdir/server_inventory_$HOSTNAME.log
-hdparm -t --direct --offset 256 /dev/sda1 >> $auditlogdir/server_inventory_$HOSTNAME.log
+echo "hdparm -t --direct /dev/sda1:" >> $auditlogdir/server_inventory_$HOSTNAME.log
+hdparm -t --direct /dev/sda1 >> $auditlogdir/server_inventory_$HOSTNAME.log
+echo "" >> $auditlogdir/server_inventory_$HOSTNAME.log
 echo "-----------------------------------------------------------------------------------------------------------------" >> $auditlogdir/server_inventory_$HOSTNAME.log
 echo "hdparm -t --direct --offset 256 /dev/sda1:" >> $auditlogdir/server_inventory_$HOSTNAME.log
 hdparm -t --direct --offset 256 /dev/sda1 >> $auditlogdir/server_inventory_$HOSTNAME.log
+echo "" >> $auditlogdir/server_inventory_$HOSTNAME.log
 echo "-----------------------------------------------------------------------------------------------------------------" >> $auditlogdir/server_inventory_$HOSTNAME.log
 echo "cat /sys/block/sda/queue/scheduler:" >> $auditlogdir/server_inventory_$HOSTNAME.log
 cat /sys/block/sda/queue/scheduler >> $auditlogdir/server_inventory_$HOSTNAME.log
@@ -261,6 +264,15 @@ cat /proc/sys/kernel/shmmax >> $auditlogdir/server_inventory_$HOSTNAME.log
 echo "-----------------------------------------------------------------------------------------------------------------" >> $auditlogdir/server_inventory_$HOSTNAME.log
 echo "sysctl -a | grep shm:" >> $auditlogdir/server_inventory_$HOSTNAME.log
 sysctl -a | grep shm >> $auditlogdir/server_inventory_$HOSTNAME.log
+echo "-----------------------------------------------------------------------------------------------------------------" >> $auditlogdir/server_inventory_$HOSTNAME.log
+echo "grep -i Huge /proc/meminfo:" >> $auditlogdir/server_inventory_$HOSTNAME.log
+grep -i Huge /proc/meminfo >> $auditlogdir/server_inventory_$HOSTNAME.log
+echo "-----------------------------------------------------------------------------------------------------------------" >> $auditlogdir/server_inventory_$HOSTNAME.log
+echo "ipcs -m:" >> $auditlogdir/server_inventory_$HOSTNAME.log
+ipcs -m >> $auditlogdir/server_inventory_$HOSTNAME.log
+echo "-----------------------------------------------------------------------------------------------------------------" >> $auditlogdir/server_inventory_$HOSTNAME.log
+echo "fgrep dba /etc/group:" >> $auditlogdir/server_inventory_$HOSTNAME.log
+fgrep dba /etc/group >> $auditlogdir/server_inventory_$HOSTNAME.log
 echo "-----------------------------------------------------------------------------------------------------------------" >> $auditlogdir/server_inventory_$HOSTNAME.log
 echo "numactl --show:" >> $auditlogdir/server_inventory_$HOSTNAME.log
 numactl --show >> $auditlogdir/server_inventory_$HOSTNAME.log
@@ -306,6 +318,9 @@ lsinitrd >> $auditlogdir/server_inventory_$HOSTNAME.log
 echo "-----------------------------------------------------------------------------------------------------------------" >> $auditlogdir/server_inventory_$HOSTNAME.log
 echo "chkconfig --list:" >> $auditlogdir/server_inventory_$HOSTNAME.log
 chkconfig --list >> $auditlogdir/server_inventory_$HOSTNAME.log
+echo "-----------------------------------------------------------------------------------------------------------------" >> $auditlogdir/server_inventory_$HOSTNAME.log
+echo "chkconfig --list | grep on:" >> $auditlogdir/server_inventory_$HOSTNAME.log
+chkconfig --list | grep on >> $auditlogdir/server_inventory_$HOSTNAME.log
 echo "-----------------------------------------------------------------------------------------------------------------" >> $auditlogdir/server_inventory_$HOSTNAME.log
 echo "systemctl list-unit-files | grep enabled:" >> $auditlogdir/server_inventory_$HOSTNAME.log
 systemctl list-unit-files | grep enabled >> $auditlogdir/server_inventory_$HOSTNAME.log
@@ -361,8 +376,11 @@ echo "--------------------------------------------------------------------------
 echo "lsof -i -n:" >> $auditlogdir/server_inventory_$HOSTNAME.log
 lsof -i -n | egrep 'COMMAND|LISTEN|UDP' >> $auditlogdir/server_inventory_$HOSTNAME.log
 echo "-----------------------------------------------------------------------------------------------------------------" >> $auditlogdir/server_inventory_$HOSTNAME.log
-echo "lsof:" >> $auditlogdir/server_inventory_$HOSTNAME.log
-lsof >> $auditlogdir/server_inventory_$HOSTNAME.log
+echo "lsof -d mem:" >> $auditlogdir/server_inventory_$HOSTNAME.log
+lsof -d mem >> $auditlogdir/server_inventory_$HOSTNAME.log
+#echo "-----------------------------------------------------------------------------------------------------------------" >> $auditlogdir/server_inventory_$HOSTNAME.log
+#echo "lsof:" >> $auditlogdir/server_inventory_$HOSTNAME.log
+#lsof >> $auditlogdir/server_inventory_$HOSTNAME.log
 echo "-----------------------------------------------------------------------------------------------------------------" >> $auditlogdir/server_inventory_$HOSTNAME.log
 echo "iptables --list:" >> $auditlogdir/server_inventory_$HOSTNAME.log
 iptables --list >> $auditlogdir/server_inventory_$HOSTNAME.log
@@ -433,17 +451,20 @@ echo "--------------------------------------------------------------------------
 echo "cat /proc/interrupts:" >> $auditlogdir/server_inventory_$HOSTNAME.log
 cat /proc/interrupts >> $auditlogdir/server_inventory_$HOSTNAME.log
 echo "-----------------------------------------------------------------------------------------------------------------" >> $auditlogdir/server_inventory_$HOSTNAME.log
-echo "cat /proc/interrupts | grep -E "CPU|em1" | sed -r "s/ +/  /g" | sed -r "s/CPU//g":" >> $auditlogdir/server_inventory_$HOSTNAME.log
+echo "cat /proc/interrupts | grep -E "CPU|em1" :" >> $auditlogdir/server_inventory_$HOSTNAME.log
 cat /proc/interrupts | grep -E "CPU|em1" | sed -r "s/ +/  /g" | sed -r "s/CPU//g" >> $auditlogdir/server_inventory_$HOSTNAME.log
 echo "-----------------------------------------------------------------------------------------------------------------" >> $auditlogdir/server_inventory_$HOSTNAME.log
-echo "cat /proc/interrupts | grep -E "CPU|em2" | sed -r "s/ +/  /g" | sed -r "s/CPU//g":" >> $auditlogdir/server_inventory_$HOSTNAME.log
+echo "cat /proc/interrupts | grep -E "CPU|em2" :" >> $auditlogdir/server_inventory_$HOSTNAME.log
 cat /proc/interrupts | grep -E "CPU|em2" | sed -r "s/ +/  /g" | sed -r "s/CPU//g" >> $auditlogdir/server_inventory_$HOSTNAME.log
 echo "-----------------------------------------------------------------------------------------------------------------" >> $auditlogdir/server_inventory_$HOSTNAME.log
+echo "cat /proc/interrupts | grep -E "CPU|bond0" :" >> $auditlogdir/server_inventory_$HOSTNAME.log
+cat /proc/interrupts | grep -E "CPU|bond0" | sed -r "s/ +/  /g" | sed -r "s/CPU//g" >> $auditlogdir/server_inventory_$HOSTNAME.log
+echo "-----------------------------------------------------------------------------------------------------------------" >> $auditlogdir/server_inventory_$HOSTNAME.log
 echo "java -version:" >> $auditlogdir/server_inventory_$HOSTNAME.log
-java -version >> $auditlogdir/server_inventory_$HOSTNAME.log
+sudo java -version >> $auditlogdir/server_inventory_$HOSTNAME.log
 echo "-----------------------------------------------------------------------------------------------------------------" >> $auditlogdir/server_inventory_$HOSTNAME.log
 echo "javac -version:" >> $auditlogdir/server_inventory_$HOSTNAME.log
-javac -version >> $auditlogdir/server_inventory_$HOSTNAME.log
+sudo javac -version >> $auditlogdir/server_inventory_$HOSTNAME.log
 echo "-----------------------------------------------------------------------------------------------------------------" >> $auditlogdir/server_inventory_$HOSTNAME.log
 echo "cat /root/.ssh/authorized_keys:" >> $auditlogdir/server_inventory_$HOSTNAME.log
 cat /root/.ssh/authorized_keys >> $auditlogdir/server_inventory_$HOSTNAME.log
@@ -459,9 +480,9 @@ ac -p >> $auditlogdir/server_inventory_$HOSTNAME.log
 echo "-----------------------------------------------------------------------------------------------------------------" >> $auditlogdir/server_inventory_$HOSTNAME.log
 echo "ac -d -y:" >> $auditlogdir/server_inventory_$HOSTNAME.log
 ac -d -y >> $auditlogdir/server_inventory_$HOSTNAME.log
-echo "-----------------------------------------------------------------------------------------------------------------" >> $auditlogdir/server_inventory_$HOSTNAME.log
-echo "sa --print-users:" >> $auditlogdir/server_inventory_$HOSTNAME.log
-sa --print-users >> $auditlogdir/server_inventory_$HOSTNAME.log
+#echo "-----------------------------------------------------------------------------------------------------------------" >> $auditlogdir/server_inventory_$HOSTNAME.log
+#echo "sa --print-users:" >> $auditlogdir/server_inventory_$HOSTNAME.log
+#sa --print-users >> $auditlogdir/server_inventory_$HOSTNAME.log
 echo "-----------------------------------------------------------------------------------------------------------------" >> $auditlogdir/server_inventory_$HOSTNAME.log
 echo "egrep -v '.*:\*|:\!' /etc/shadow:" >> $auditlogdir/server_inventory_$HOSTNAME.log
 egrep -v '.*:\*|:\!' /etc/shadow | awk -F: '{print $1}' >> $auditlogdir/server_inventory_$HOSTNAME.log
@@ -502,11 +523,11 @@ echo "--------------------------------------------------------------------------
 echo "tail -n 1000 /var/log/messages:" >> $auditlogdir/server_inventory_$HOSTNAME.log
 tail -n 1000 /var/log/messages >> $auditlogdir/server_inventory_$HOSTNAME.log
 echo "-----------------------------------------------------------------------------------------------------------------" >> $auditlogdir/server_inventory_$HOSTNAME.log
-echo "tail -n 500 /var/log/kern.log:" >> $auditlogdir/server_inventory_$HOSTNAME.log
-tail -n 500 /var/log/kern.log >> $auditlogdir/server_inventory_$HOSTNAME.log
+echo "tail -n 1000 /var/log/kern.log:" >> $auditlogdir/server_inventory_$HOSTNAME.log
+tail -n 1000 /var/log/kern.log >> $auditlogdir/server_inventory_$HOSTNAME.log
 echo "-----------------------------------------------------------------------------------------------------------------" >> $auditlogdir/server_inventory_$HOSTNAME.log
-echo "tail -n 500 /var/log/auth.log:" >> $auditlogdir/server_inventory_$HOSTNAME.log
-tail -n 500 /var/log/auth.log >> $auditlogdir/server_inventory_$HOSTNAME.log
+echo "tail -n 1000 /var/log/auth.log:" >> $auditlogdir/server_inventory_$HOSTNAME.log
+tail -n 1000 /var/log/auth.log >> $auditlogdir/server_inventory_$HOSTNAME.log
 echo "-----------------------------------------------------------------------------------------------------------------" >> $auditlogdir/server_inventory_$HOSTNAME.log
 echo "tail -n 1000 /var/syslog:" >> $auditlogdir/server_inventory_$HOSTNAME.log
 tail -n 1000 /var/syslog >> $auditlogdir/server_inventory_$HOSTNAME.log
@@ -517,7 +538,7 @@ echo "--------------------------------------------------------------------------
 echo "who:" >> $auditlogdir/server_inventory_$HOSTNAME.log
 who >> $auditlogdir/server_inventory_$HOSTNAME.log
 echo "-----------------------------------------------------------------------------------------------------------------" >> $auditlogdir/server_inventory_$HOSTNAME.log
-echo "" >> $auditlogdir/server_inventory_$HOSTNAME.log
+#echo "" >> $auditlogdir/server_inventory_$HOSTNAME.log
 echo "hostname:" >> $auditlogdir/server_inventory_$HOSTNAME.log
 hostname  >> $auditlogdir/server_inventory_$HOSTNAME.log
 echo "-----------------------------------------------------------------------------------------------------------------" >> $auditlogdir/server_inventory_$HOSTNAME.log
@@ -525,7 +546,7 @@ echo "uptime:" >> $auditlogdir/server_inventory_$HOSTNAME.log
 uptime >> $auditlogdir/server_inventory_$HOSTNAME.log
 echo "-----------------------------------------------------------------------------------------------------------------" >> $auditlogdir/server_inventory_$HOSTNAME.log
 echo "etckeeper daily commit:" >> $auditlogdir/server_inventory_$HOSTNAME.log
-etckeeper commit "Update information about all files and configurations in /etc folder. State at $DATE" >> $auditlogdir/server_inventory_$HOSTNAME.log
+etckeeper commit "Update detail information about all files and configurations in /etc folder... State at $DATE" >> $auditlogdir/server_inventory_$HOSTNAME.log
 sleep 5
 echo "-----------------------------------------------------------------------------------------------------------------" >> $auditlogdir/server_inventory_$HOSTNAME.log
 #echo "" >> $auditlogdir/server_inventory_$HOSTNAME.log
@@ -537,8 +558,8 @@ echo "##########################################################################
 #
 # Create and verify other parameters
 /bin/chmod 0644 $auditlogdir/server_inventory_$HOSTNAME.log
-echo "Creating the backup inventory data and storing it in a $auditlogdir/server_inventory_$HOSTNAME.log"
-echo "This audit/data file is needed for the Disaster Recovery Plan using in Corporate Backup System Bacula!"
+echo "Creating the backup inventory data and storing in $auditlogdir/server_inventory_$HOSTNAME.log"
+echo "This audit/data file is needed for the Disaster Recovery Plan using with Corporate Backup System Bacula"
 #
 # Sending copy of audit/data to DevOps MailGroup
 msg="This is copy of inventory data from HOST: $HOSTNAME, verify at $DATE_START. This audit/data file is needed for bare metal recovery procedures... -->"
