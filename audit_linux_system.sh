@@ -80,7 +80,7 @@
 #
 #######################################################################################################################
 # Script modified date
-Version=24012022
+Version=25012022
 #
 #######################################################################################################################
 # Exit code status
@@ -310,6 +310,9 @@ echo "--------------------------------------------------------------------------
 echo "lshw:" >> $auditlogdir/server_inventory_$HOSTNAME.log
 lshw >> $auditlogdir/server_inventory_$HOSTNAME.log
 echo "-----------------------------------------------------------------------------------------------------------------" >> $auditlogdir/server_inventory_$HOSTNAME.log
+echo "egrep '(vmx|svm)' /proc/cpuinfo:" >> $auditlogdir/server_inventory_$HOSTNAME.log
+egrep '(vmx|svm)' /proc/cpuinfo >> $auditlogdir/server_inventory_$HOSTNAME.log
+echo "-----------------------------------------------------------------------------------------------------------------" >> $auditlogdir/server_inventory_$HOSTNAME.log
 echo "lslogins:" >> $auditlogdir/server_inventory_$HOSTNAME.log
 lslogins >> $auditlogdir/server_inventory_$HOSTNAME.log
 echo "-----------------------------------------------------------------------------------------------------------------" >> $auditlogdir/server_inventory_$HOSTNAME.log
@@ -459,6 +462,51 @@ cat /proc/interrupts | grep -E "CPU|em2" | sed -r "s/ +/  /g" | sed -r "s/CPU//g
 echo "-----------------------------------------------------------------------------------------------------------------" >> $auditlogdir/server_inventory_$HOSTNAME.log
 echo "cat /proc/interrupts | grep -E "CPU|bond0" :" >> $auditlogdir/server_inventory_$HOSTNAME.log
 cat /proc/interrupts | grep -E "CPU|bond0" | sed -r "s/ +/  /g" | sed -r "s/CPU//g" >> $auditlogdir/server_inventory_$HOSTNAME.log
+echo "-----------------------------------------------------------------------------------------------------------------" >> $auditlogdir/server_inventory_$HOSTNAME.log
+echo "virsh nodinfo:" >> $auditlogdir/server_inventory_$HOSTNAME.log
+virsh nodinfo >> $auditlogdir/server_inventory_$HOSTNAME.log
+echo "-----------------------------------------------------------------------------------------------------------------" >> $auditlogdir/server_inventory_$HOSTNAME.log
+echo "virsh list --all:" >> $auditlogdir/server_inventory_$HOSTNAME.log
+virsh list --all >> $auditlogdir/server_inventory_$HOSTNAME.log
+echo "-----------------------------------------------------------------------------------------------------------------" >> $auditlogdir/server_inventory_$HOSTNAME.log
+echo "virsh list:" >> $auditlogdir/server_inventory_$HOSTNAME.log
+virsh list >> $auditlogdir/server_inventory_$HOSTNAME.log
+echo "-----------------------------------------------------------------------------------------------------------------" >> $auditlogdir/server_inventory_$HOSTNAME.log
+echo "virsh pool-list --all:" >> $auditlogdir/server_inventory_$HOSTNAME.log
+virsh pool-list --all >> $auditlogdir/server_inventory_$HOSTNAME.log
+echo "-----------------------------------------------------------------------------------------------------------------" >> $auditlogdir/server_inventory_$HOSTNAME.log
+echo "virsh pool-list:" >> $auditlogdir/server_inventory_$HOSTNAME.log
+virsh pool-list >> $auditlogdir/server_inventory_$HOSTNAME.log
+echo "-----------------------------------------------------------------------------------------------------------------" >> $auditlogdir/server_inventory_$HOSTNAME.log
+echo "virsh vol-list --pool default:" >> $auditlogdir/server_inventory_$HOSTNAME.log
+virsh vol-list --pool default >> $auditlogdir/server_inventory_$HOSTNAME.log
+echo "-----------------------------------------------------------------------------------------------------------------" >> $auditlogdir/server_inventory_$HOSTNAME.log
+echo "virsh net-list --all:" >> $auditlogdir/server_inventory_$HOSTNAME.log
+virsh net-list --all >> $auditlogdir/server_inventory_$HOSTNAME.log
+echo "-----------------------------------------------------------------------------------------------------------------" >> $auditlogdir/server_inventory_$HOSTNAME.log
+echo "virsh net-list:" >> $auditlogdir/server_inventory_$HOSTNAME.log
+virsh net-list >> $auditlogdir/server_inventory_$HOSTNAME.log
+#echo "-----------------------------------------------------------------------------------------------------------------" >> $auditlogdir/server_inventory_$HOSTNAME.log
+#echo "virt-top --csv >>:" >> $auditlogdir/server_inventory_$HOSTNAME.log
+#virt-top --csv >> $auditlogdir/server_inventory_$HOSTNAME.log
+echo "-----------------------------------------------------------------------------------------------------------------" >> $auditlogdir/server_inventory_$HOSTNAME.log
+echo "docker ps:" >> $auditlogdir/server_inventory_$HOSTNAME.log
+docker ps >> $auditlogdir/server_inventory_$HOSTNAME.log
+echo "-----------------------------------------------------------------------------------------------------------------" >> $auditlogdir/server_inventory_$HOSTNAME.log
+echo "docker ps -a:" >> $auditlogdir/server_inventory_$HOSTNAME.log
+docker ps -a >> $auditlogdir/server_inventory_$HOSTNAME.log
+echo "-----------------------------------------------------------------------------------------------------------------" >> $auditlogdir/server_inventory_$HOSTNAME.log
+echo "docker images:" >> $auditlogdir/server_inventory_$HOSTNAME.log
+docker images >> $auditlogdir/server_inventory_$HOSTNAME.log
+echo "-----------------------------------------------------------------------------------------------------------------" >> $auditlogdir/server_inventory_$HOSTNAME.log
+echo "docker volume ls:" >> $auditlogdir/server_inventory_$HOSTNAME.log
+docker volume ls >> $auditlogdir/server_inventory_$HOSTNAME.log
+echo "-----------------------------------------------------------------------------------------------------------------" >> $auditlogdir/server_inventory_$HOSTNAME.log
+echo "docker stats:" >> $auditlogdir/server_inventory_$HOSTNAME.log
+docker stats >> $auditlogdir/server_inventory_$HOSTNAME.log
+echo "-----------------------------------------------------------------------------------------------------------------" >> $auditlogdir/server_inventory_$HOSTNAME.log
+echo "docker version:" >> $auditlogdir/server_inventory_$HOSTNAME.log
+docker version >> $auditlogdir/server_inventory_$HOSTNAME.log
 echo "-----------------------------------------------------------------------------------------------------------------" >> $auditlogdir/server_inventory_$HOSTNAME.log
 echo "java -version:" >> $auditlogdir/server_inventory_$HOSTNAME.log
 sudo java -version >> $auditlogdir/server_inventory_$HOSTNAME.log
