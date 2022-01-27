@@ -17,9 +17,10 @@
 #echo "cd /etc/bacula/scripts && git clone https://github.com/MykolaPerehinets/auditlinuxsystem.git"
 #
 # Script function:
-# Configuring HugePages for Oracle on Linux (x86-64). Linux bash script to compute values for the
-# recommended HugePages/HugeTLB configuration
+# Configuring HugePages for Oracle on Linux server (x86-64)
+# Linux bash script to compute values for the recommended HugePages/HugeTLB configuration
 # https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/6/html/performance_tuning_guide/s-memory-transhuge
+# https://kevinclosson.net/2010/09/28/configuring-linux-hugepages-for-oracle-database-is-just-too-difficult-part-i/
 # https://oracle-base.com/articles/linux/configuring-huge-pages-for-oracle-on-linux-64
 # https://www.cnblogs.com/zhangshengdong/p/11889148.html
 # Please use for this action root account!
@@ -36,9 +37,24 @@
 #
 #######################################################################################################################
 # Script modified date
-Version=25012022
+Version=27012022
 #
 #######################################################################################################################
+#
+# Basic Script Configuration, deploy needed parameters, variables, etc.
+PATH=/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin
+#
+#HOSTNAME=`hostname -s`
+HOSTNAME=`hostname`
+#
+DATE=$(date +%Y-%m-%d_%H:%M)
+#DATE_START=$(date +%Y-%m-%d_%H:%M)
+#
+#######################################################################################################################
+# Run script
+echo "WARNING: Please verify Script Version on your server HOST: $HOSTNAME"
+echo "OK... Verify your system has been STARTING... Script Version in this server #$Version... "
+echo "####################################################################################"
 #
 # Check for the kernel version
 KERN=`uname -r | awk -F. '{ printf("%d.%d\n",$1,$2); }'`
@@ -58,13 +74,16 @@ do
    fi
 done
 #
-# Finish with results
+# Finish with results (recommended setting)
 case $KERN in
    '2.4') HUGETLB_POOL=`echo "$NUM_PG*$HPG_SZ/1024" | bc -q`;
-          echo "Recommended setting: vm.hugetlb_pool = $HUGETLB_POOL" ;;
-   '2.6' | '3.8' | '3.10' | '4.1' | '4.14' ) echo "Recommended setting: vm.nr_hugepages = $NUM_PG" ;;
+          echo "> Recommended setting: vm.hugetlb_pool = $HUGETLB_POOL" ;;
+   '2.6' | '3.8' | '3.10' | '4.1' | '4.14' ) echo "> Recommended setting: vm.nr_hugepages = $NUM_PG" ;;
     *) echo "Unrecognized kernel version $KERN. Exiting." ;;
 esac
 #
-# End
+echo "####################################################################################"
+echo ""
+#
+# End of script
 
