@@ -31,7 +31,7 @@
 #git config --global user.name "root"
 #git config --global user.email root@localhost.localdomain
 #
-# Additional requirements and enhancement:
+# Additional requirements and enhancement for production use:
 # for initial setup the bacula scripts, please run next command from root user
 #cd /etc/bacula/scripts
 #setenforce 0
@@ -80,7 +80,7 @@
 #
 #######################################################################################################################
 # Script modified date
-Version=25012022
+Version=27012022
 #
 #######################################################################################################################
 # Exit code status
@@ -231,18 +231,39 @@ echo "hdparm -t --direct /dev/sda1:" >> $auditlogdir/server_inventory_$HOSTNAME.
 hdparm -t --direct /dev/sda1 >> $auditlogdir/server_inventory_$HOSTNAME.log
 echo "" >> $auditlogdir/server_inventory_$HOSTNAME.log
 echo "-----------------------------------------------------------------------------------------------------------------" >> $auditlogdir/server_inventory_$HOSTNAME.log
-echo "hdparm -t --direct --offset 256 /dev/sda1:" >> $auditlogdir/server_inventory_$HOSTNAME.log
-hdparm -t --direct --offset 256 /dev/sda1 >> $auditlogdir/server_inventory_$HOSTNAME.log
+echo "hdparm -t --direct --offset 512 /dev/sda2:" >> $auditlogdir/server_inventory_$HOSTNAME.log
+hdparm -t --direct --offset 512 /dev/sda2 >> $auditlogdir/server_inventory_$HOSTNAME.log
+echo "" >> $auditlogdir/server_inventory_$HOSTNAME.log
+echo "-----------------------------------------------------------------------------------------------------------------" >> $auditlogdir/server_inventory_$HOSTNAME.log
+echo "hdparm -i /dev/sdb:" >> $auditlogdir/server_inventory_$HOSTNAME.log
+hdparm -i /dev/sdb >> $auditlogdir/server_inventory_$HOSTNAME.log
+echo "" >> $auditlogdir/server_inventory_$HOSTNAME.log
+echo "-----------------------------------------------------------------------------------------------------------------" >> $auditlogdir/server_inventory_$HOSTNAME.log
+echo "hdparm -Tt /dev/sdb1:" >> $auditlogdir/server_inventory_$HOSTNAME.log
+hdparm -Tt /dev/sdb1 >> $auditlogdir/server_inventory_$HOSTNAME.log
+echo "-----------------------------------------------------------------------------------------------------------------" >> $auditlogdir/server_inventory_$HOSTNAME.log
+echo "hdparm -t --direct /dev/sdb1:" >> $auditlogdir/server_inventory_$HOSTNAME.log
+hdparm -t --direct /dev/sdb1 >> $auditlogdir/server_inventory_$HOSTNAME.log
+echo "" >> $auditlogdir/server_inventory_$HOSTNAME.log
+echo "-----------------------------------------------------------------------------------------------------------------" >> $auditlogdir/server_inventory_$HOSTNAME.log
+echo "hdparm -t --direct --offset 512 /dev/sdb1:" >> $auditlogdir/server_inventory_$HOSTNAME.log
+hdparm -t --direct --offset 512 /dev/sdb1 >> $auditlogdir/server_inventory_$HOSTNAME.log
 echo "" >> $auditlogdir/server_inventory_$HOSTNAME.log
 echo "-----------------------------------------------------------------------------------------------------------------" >> $auditlogdir/server_inventory_$HOSTNAME.log
 echo "cat /sys/block/sda/queue/scheduler:" >> $auditlogdir/server_inventory_$HOSTNAME.log
 cat /sys/block/sda/queue/scheduler >> $auditlogdir/server_inventory_$HOSTNAME.log
+echo "-----------------------------------------------------------------------------------------------------------------" >> $auditlogdir/server_inventory_$HOSTNAME.log
+echo "cat /sys/block/sdb/queue/scheduler:" >> $auditlogdir/server_inventory_$HOSTNAME.log
+cat /sys/block/sdb/queue/scheduler >> $auditlogdir/server_inventory_$HOSTNAME.log
 echo "-----------------------------------------------------------------------------------------------------------------" >> $auditlogdir/server_inventory_$HOSTNAME.log
 echo "cat /sys/block/sd*/queue/scheduler:" >> $auditlogdir/server_inventory_$HOSTNAME.log
 cat /sys/block/sd*/queue/scheduler >> $auditlogdir/server_inventory_$HOSTNAME.log
 echo "-----------------------------------------------------------------------------------------------------------------" >> $auditlogdir/server_inventory_$HOSTNAME.log
 echo "cat /sys/block/sda/queue/nr_requests:" >> $auditlogdir/server_inventory_$HOSTNAME.log
 cat /sys/block/sda/queue/nr_requests >> $auditlogdir/server_inventory_$HOSTNAME.log
+echo "-----------------------------------------------------------------------------------------------------------------" >> $auditlogdir/server_inventory_$HOSTNAME.log
+echo "cat /sys/block/sdb/queue/nr_requests:" >> $auditlogdir/server_inventory_$HOSTNAME.log
+cat /sys/block/sdb/queue/nr_requests >> $auditlogdir/server_inventory_$HOSTNAME.log
 echo "-----------------------------------------------------------------------------------------------------------------" >> $auditlogdir/server_inventory_$HOSTNAME.log
 echo "cat /sys/block/sd*/queue/nr_requests:" >> $auditlogdir/server_inventory_$HOSTNAME.log
 cat /sys/block/sd*/queue/nr_requests >> $auditlogdir/server_inventory_$HOSTNAME.log
@@ -268,8 +289,20 @@ echo "--------------------------------------------------------------------------
 echo "grep -i Huge /proc/meminfo:" >> $auditlogdir/server_inventory_$HOSTNAME.log
 grep -i Huge /proc/meminfo >> $auditlogdir/server_inventory_$HOSTNAME.log
 echo "-----------------------------------------------------------------------------------------------------------------" >> $auditlogdir/server_inventory_$HOSTNAME.log
+echo "cat cat /proc/cpuinfo | grep pdpe1gb:" >> $auditlogdir/server_inventory_$HOSTNAME.log
+cat /proc/cpuinfo | grep pdpe1gb >> $auditlogdir/server_inventory_$HOSTNAME.log
+echo "-----------------------------------------------------------------------------------------------------------------" >> $auditlogdir/server_inventory_$HOSTNAME.log
+echo "cat /sys/kernel/mm/transparent_hugepage/enabled:" >> $auditlogdir/server_inventory_$HOSTNAME.log
+cat /sys/kernel/mm/transparent_hugepage/enabled >> $auditlogdir/server_inventory_$HOSTNAME.log
+echo "-----------------------------------------------------------------------------------------------------------------" >> $auditlogdir/server_inventory_$HOSTNAME.log
+echo "cat /sys/kernel/mm/transparent_hugepage/defrag:" >> $auditlogdir/server_inventory_$HOSTNAME.log
+cat /sys/kernel/mm/transparent_hugepage/defrag >> $auditlogdir/server_inventory_$HOSTNAME.log
+echo "-----------------------------------------------------------------------------------------------------------------" >> $auditlogdir/server_inventory_$HOSTNAME.log
 echo "ipcs -m:" >> $auditlogdir/server_inventory_$HOSTNAME.log
 ipcs -m >> $auditlogdir/server_inventory_$HOSTNAME.log
+echo "-----------------------------------------------------------------------------------------------------------------" >> $auditlogdir/server_inventory_$HOSTNAME.log
+echo "ipcs -pm:" >> $auditlogdir/server_inventory_$HOSTNAME.log
+ipcs -pm >> $auditlogdir/server_inventory_$HOSTNAME.log
 echo "-----------------------------------------------------------------------------------------------------------------" >> $auditlogdir/server_inventory_$HOSTNAME.log
 echo "fgrep dba /etc/group:" >> $auditlogdir/server_inventory_$HOSTNAME.log
 fgrep dba /etc/group >> $auditlogdir/server_inventory_$HOSTNAME.log
@@ -509,10 +542,10 @@ echo "docker version:" >> $auditlogdir/server_inventory_$HOSTNAME.log
 docker version >> $auditlogdir/server_inventory_$HOSTNAME.log
 echo "-----------------------------------------------------------------------------------------------------------------" >> $auditlogdir/server_inventory_$HOSTNAME.log
 echo "java -version:" >> $auditlogdir/server_inventory_$HOSTNAME.log
-sudo java -version >> $auditlogdir/server_inventory_$HOSTNAME.log
+java -version >> $auditlogdir/server_inventory_$HOSTNAME.log
 echo "-----------------------------------------------------------------------------------------------------------------" >> $auditlogdir/server_inventory_$HOSTNAME.log
 echo "javac -version:" >> $auditlogdir/server_inventory_$HOSTNAME.log
-sudo javac -version >> $auditlogdir/server_inventory_$HOSTNAME.log
+javac -version >> $auditlogdir/server_inventory_$HOSTNAME.log
 echo "-----------------------------------------------------------------------------------------------------------------" >> $auditlogdir/server_inventory_$HOSTNAME.log
 echo "cat /root/.ssh/authorized_keys:" >> $auditlogdir/server_inventory_$HOSTNAME.log
 cat /root/.ssh/authorized_keys >> $auditlogdir/server_inventory_$HOSTNAME.log
